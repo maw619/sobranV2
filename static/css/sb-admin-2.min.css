@@ -505,15 +505,20 @@ pre code {
   .container,
   .container-sm {
     max-width: 540px;
-  }
+  }  
 }
+
 @media (min-width: 768px) {
   .container,
   .container-md,
   .container-sm {
     max-width: 720px;
   }
+    #date_range_form {
+    display: none;
+  }  
 }
+
 @media (min-width: 992px) {
   .container,
   .container-lg,
@@ -521,7 +526,11 @@ pre code {
   .container-sm {
     max-width: 960px;
   }
+    #date_range_form {
+    display: none;
+  }
 }
+
 @media (min-width: 1200px) {
   .container,
   .container-lg,
@@ -10298,7 +10307,7 @@ form.user .btn-user {
   95% {
     clip: rect(34px, 9999px, 90px, 0);
   }
-  100% {
+  100% { 
     clip: rect(67px, 9999px, 68px, 0);
   }
 }

@@ -61,9 +61,19 @@ def home(request):
     result = request.GET.get('employee_name')
     if result is not None:
         print(result)
-        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date])  and Q(co_fk_em_id_key__em_name__icontains=result))
+        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) and Q(co_fk_em_id_key__em_name__icontains=result)) 
     else:
         sout = SoOut.objects.filter(co_date__range=[start_date, end_date])
+
+
+    # employee_name = request.GET.get('employee_name')
+
+    # if employee_name:
+    #     sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) and Q(co_fk_em_id_key__em_name__exact=employee_name))
+    # else:
+    #     sout = SoOut.objects.filter(co_date__range=[start_date, end_date], co_fk_em_id_key__em_name__isnull=False)
+
+
     # sout = SoOut.objects.filter(co_date=str(today))
     sout.order_by('-co_date')
 
@@ -200,7 +210,51 @@ def update_so_out(request, pk):
  
 
 
+@login_required(login_url='login')
+def add_sout_manually(request):
+    sout = SoOut.objects.all()
+    shift = Shift.objects.all()
+    date_value = request.POST.get('date')
+    
+    for x in shift:
+        y_start = x.yellow_start
+        r_start = x.red_start 
+         
+    
+    form = UpdateoOutsForm(request.POST or None)
+    if request.method == 'POST':
 
+        form.instance.co_time_arrived = request.POST.get('time')
+        print("time arrived: ", form.instance.co_time_arrived)
+        form.save()
+        zone = form.instance.co_fk_em_id_key.em_zone
+        if zone == 1:
+            time = y_start
+        else:
+            time = r_start  
+
+        time_value = request.POST.get('time')
+        if time_value == "":
+            time_obj = None
+        else:
+            time_obj = datetime.strptime(time_value, '%H:%M').time()
+        date_value = request.POST.get('date')
+        date_obj = datetime.strptime(date_value, '%Y-%m-%d').date()
+        print("date obj: ", date_obj)
+        form.instance.co_date = date_obj
+        form.instance.co_time_arrived = time_obj
+            
+        form.save()  
+        if time_obj is not None:
+            time_diff = datetime.combine(datetime.today(), time_obj) - datetime.combine(datetime.today(), time) 
+        else:
+            time_diff = None
+        form.instance.co_time_dif = str(time_diff)[0:4]
+        print("time diff: ", form.instance.co_time_dif)
+        form.save()  
+        return redirect('home')
+    context = {'form': form}
+    return render(request, 'home.html', context)
 
 
 

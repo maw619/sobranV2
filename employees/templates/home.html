@@ -7,7 +7,7 @@
  
 
 
-<form id="date_range_form"  class="form-inline mb-5">
+<form id="date_range_form" class="form-inline mb-5">
     <label for="birthday">start</label>
     <input type="date" value={{date_today}} name="start_date" class="form-control">
     <label for="birthday">end</label>
@@ -74,34 +74,18 @@
 
 
 
-                                                        <!-- Logout Modal  data-toggle="modal" data-target="#logoutModal"-->
-                            <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                                                        <!-- Logout Modal  data-toggle="modal" data-target="#addTransactionModal"-->
+                            <div class="modal fade" id="addTransactionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                                 aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="exampleModalLabel">Update Transaction</h5>
-                                            <form action="" method="post">
-                                                {% csrf_token %}
-                                                <div class="mb-3">
-
-                                                    {{form.as_p}}
-                                                    <div class="form-group">
-                                                        <label for="date">Date:</label>
-                                                        <input type="date" id="date" name="date" class="form-control" required>
-                                                    </div>
-                                                    <br>
-                                                    <label for="time">Time:</label>
-                                                    <input type="time" name="time" id="time" value="{{time_value}}" /> 
-                                                </div>
-                                                
-                                                <button type="submit" class="btn btn-primary">Submit</button>
-                                            </form>
-                                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>               
+                                                     
                                         </div>
-                                        
+                                         <div class="container">
+                                           {% include 'add_transaction_form.html' %}
+                                         </div>  
                                     </div>
                                 </div>
                             </div>
