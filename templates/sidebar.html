@@ -1,32 +1,71 @@
-<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+<ul
+  class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+  id="accordionSidebar"
+>
+  <!-- Sidebar - Brand -->
+  <a
+    class="sidebar-brand d-flex align-items-center justify-content-center"
+    href="{% url 'home' %}"
+  >
+    <div class="sidebar-brand-icon">
+      <!--  <i class="fas fa-laugh-wink"></i> -->
+      {% load static %}
+      <img src="{% static 'sobranLogo.png' %}" width="65px" height="50px" />
+    </div>
+    <div class="sidebar-brand-text mx-3">Sobran</div>
+  </a>
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'home' %}">
-                <div class="sidebar-brand-icon ">
-                   <!--  <i class="fas fa-laugh-wink"></i> -->
-                    {% load static %}
-                    <img src="{% static 'sobranLogo.png' %}" width="65px" height="50px">
-                </div>
-                <div class="sidebar-brand-text mx-3">Sobran</div>
-            </a>
+  <!-- Divider -->
+  <hr class="sidebar-divider my-0" />
 
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
+  <!-- Nav Item - Dashboard -->
+  <li class="nav-item">
+    <a class="nav-link" href="{%  url 'admin:index' %}">
+      <i class="fas fa-fw fa-tachometer-alt"></i>
+      <span>Admin Panel</span></a
+    >
+  </li>
 
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
-                <a class="nav-link" href="{%  url 'admin:index' %}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Admin Panel</span></a>
-            </li>
+  <!-- Divider -->
+  <hr class="sidebar-divider d-none d-md-block" />
 
-  
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
+  <form action="" id="date_range_form" class="px-3">
+    <div class="form-group">
+      <label for="start" style="color: white">start</label>
+      <input
+        type="date"
+        id="start"
+        value="{{date_today}}"
+        name="start_date"
+        class="form-control"
+      />
+      <label for="end" style="color: white"> end</label>
+      <input
+        type="date"
+        id="end"
+        name="end_date"
+        id="end_input"
+        class="form-control"
+      />
+      <label for="name">Name</label>
+      <select name="employee_name" id="employee_name" class="form-control">
+        <option value="all">Employee</option>
+        {% for x in emp %}
+        <option value="{{x.em_name}}">{{x.em_name}}</option>
+        {% endfor %}
+      </select>
+    </div>
 
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+    <a href="{% url 'home' %}" type="submit" class="btn btn-primary">Reset</a>
+  </form>
 
-        </ul>
+  <!-- Sidebar Toggler (Sidebar) -->
+  <br />
+  <br />
+  <br />
+  <br />
+  <div class="text-center d-none d-md-inline">
+    <button class="rounded-circle border-0" id="sidebarToggle"></button>
+  </div>
+</ul>

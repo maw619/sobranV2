@@ -5,9 +5,8 @@ from datetime import date, datetime, time
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from .forms import DateRangeForm
-from django.http import JsonResponse
-
+from .forms import DateRangeForm 
+from django.db.models import Q
 
 
 
@@ -47,7 +46,7 @@ def home(request):
         start_date = today
         end_date = today
     else:
-   
+        
         start_date = request.GET.get('start_date')
         start_date_datetime = datetime.strptime(start_date, '%Y-%m-%d')
         start_date_formatted = start_date_datetime.strftime('%B %d, %Y')  
@@ -58,8 +57,13 @@ def home(request):
 
         date_range_label = f"Transactions for {start_date_formatted} to {end_date_formatted}"
     
-        print(str(end_date_datetime))
-    sout = SoOut.objects.filter(co_date__range=[start_date, end_date])
+    
+    result = request.GET.get('employee_name')
+    if result is not None:
+        print(result)
+        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date])  and Q(co_fk_em_id_key__em_name__icontains=result))
+    else:
+        sout = SoOut.objects.filter(co_date__range=[start_date, end_date])
     # sout = SoOut.objects.filter(co_date=str(today))
     sout.order_by('-co_date')
 
@@ -106,7 +110,7 @@ def home(request):
                 form.save() 
                 return redirect('home') 
            
-    context = {'sout': sout, 'emp': emp, 'form':form, 'date_today': datetime.today().date(),'date_range_label': date_range_label, 'date_value':end_date_datetime}
+    context = {'sout': sout, 'emp': emp, 'form':form, 'date_today': datetime.today().date(),'date_range_label': date_range_label, 'date_value':str(end_date_datetime)}
     return render(request, 'home.html', context)
 
 
