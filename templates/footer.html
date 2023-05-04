@@ -1,0 +1,62 @@
+    {% load static %}
+    <!-- Bootstrap core JavaScript-->
+    
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+
+    <!-- Page level plugins -->
+    <script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+    
+{% comment %} <script>
+    $(document).ready(function () {
+        // This code will execute on page load
+        $("body").toggleClass("sidebar-toggled");
+        $(".sidebar").toggleClass("toggled");
+        if ($(".sidebar").hasClass("toggled")) {
+            $('.sidebar .collapse').collapse('hide');
+        };
+    });
+</script> {% endcomment %}
+
+
+
+
+
+
+
+<script>
+  $("#single1").select2({
+    placeholder: "Select Employee",
+    allowClear: true,
+    
+  });
+  $("#single2").select2({
+    placeholder: "Select an Employee",
+    allowClear: true,
+  });
+  $("#single3").select2({
+    placeholder: "Select a Supervisor",
+    allowClear: true,
+  });
+  $("#single4").select2({
+    placeholder: "choose email(s):",
+    allowClear: true,
+    dropdownParent: $('#staticBackdrop'),
+  });
+  
+</script>
+</body>
+
+</html>

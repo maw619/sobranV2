@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% comment %} <a href="{% url 'dates' %}">go to datwa</a> {% endcomment %}
+
+ 
+
+
+<form method="post" id="maform" name="maform">
+    {% csrf_token %}
+    {{form2}}
+
+    <button type="submit" name="date_form_submit">Submit</button>
+</form>
+
+
+<div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Transactions</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Column 1</th>
+                                                    <th>Column 2</th>
+                                                    <th>Column 3</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                                                        <!-- Logout Modal  data-toggle="modal" data-target="#logoutModal"-->
+                            <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Update Transaction</h5>
+                                            <form action="" method="post">
+                                                {% csrf_token %}
+                                                <div class="mb-3">
+
+                                                    {{form.as_p}}
+                                                    <div class="form-group">
+                                                        <label for="date">Date:</label>
+                                                        <input type="date" id="date" name="date" class="form-control" required>
+                                                    </div>
+                                                    <br>
+                                                    <label for="time">Time:</label>
+                                                    <input type="time" name="time" id="time" value="{{time_value}}" /> 
+                                                </div>
+                                                
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                            </form>
+                                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>               
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                            <script>
+                                $(document).ready(function() {
+    $.ajax({
+        url: '{% url "get_data" %}',
+        dataType: 'json',
+        success: function(data) {
+            var tbody = $('#data-table tbody');
+            for (var i = 0; i < data.sout.length; i++) {
+            
+                var row = $('<tr>');
+                row.append($('<td>').text(data.sout[i].co_id_key));
+                row.append($('<td>').text(data.sout[i].co_fk_em_id_key_id));
+                row.append($('<td>').text(data.sout[i].co_time_arrived));
+                tbody.append(row);
+            }
+            for (var i = 0; i < data.emp.length; i++) {
+                var row = $('<tr>');
+                row.append($('<td>').text(data.emp[i].field1));
+                row.append($('<td>').text(data.emp[i].field2));
+                row.append($('<td>').text(data.emp[i].field3));
+                tbody.append(row);
+            }
+        }
+    });
+});
+
+                            </script>
+{% endblock content %}

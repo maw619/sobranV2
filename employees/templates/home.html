@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% comment %} <a href="{% url 'dates' %}">go to datwa</a> {% endcomment %}
+
+ 
+
+
+<form id="date_range_form">
+    <label for="birthday">start</label>
+    <input type="date" value={{date_today}}  name="start_date">
+    <label for="birthday">end</label>
+    <input type="date"  name="end_date" id="end_input">
+ 
+</form>
+
+
+<div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary"> {{ date_range_label}}</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Type</th>
+                                                    <th>Date</th>
+                                                    <th>Time Arrived</th>
+                                                    <th>Time diff</th>
+                                                    <th>edit</th>
+                                                    <th>delete</th>
+                                                </tr>
+                                            </thead>
+                                            <tfoot>
+                                                <tr>
+                                                   <th>Name</th>
+                                                    <th>Type</th>
+                                                    <th>Date</th>
+                                                    <th>Time Arrived</th>
+                                                    <th>Time diff</th>
+                                                    <th>edit</th>
+                                                    <th>delete</th>
+                                                </tr>
+                                            </tfoot>
+                                            <tbody>
+
+                                            {% for x in sout %}
+                                            <tr>
+                                                {% comment %} <td><a href="{% url 'view_transaction' x.co_id_key %}">{{x.co_fk_em_id_key.em_name}}</a> </td> {% endcomment %}
+                                                <td><a href="">{{x.co_fk_em_id_key.em_name}}</a> </td>
+                                                <td>{{x.co_fk_type_id_key}}</td>
+                                                <td>{{x.co_date}}</td> 
+                                            
+                                                {% if x.co_time_arrived == None %}
+                                                <td></td>
+                                                <td></td>
+                                                {% else %}
+                                                <td>{{x.co_time_arrived}}</td>
+                                                <td>{{x.co_time_dif}}</td>
+                                                {% endif %}
+                                            
+                                                <td><a href="{% url 'update_so_out' x.co_id_key %}" ><i class="fa fa-pen"></i></a></td>
+                                                <td><a href="{% url 'delete_so_out' x.co_id_key %}" style="color:red"><i class="fa fa-trash"></i></a></td>
+                  
+                                            </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                                                        <!-- Logout Modal  data-toggle="modal" data-target="#logoutModal"-->
+                            <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Update Transaction</h5>
+                                            <form action="" method="post">
+                                                {% csrf_token %}
+                                                <div class="mb-3">
+
+                                                    {{form.as_p}}
+                                                    <div class="form-group">
+                                                        <label for="date">Date:</label>
+                                                        <input type="date" id="date" name="date" class="form-control" required>
+                                                    </div>
+                                                    <br>
+                                                    <label for="time">Time:</label>
+                                                    <input type="time" name="time" id="time" value="{{time_value}}" /> 
+                                                </div>
+                                                
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                            </form>
+                                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>               
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+{% endblock content %}

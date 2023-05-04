@@ -1,0 +1,26 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+
+<form action="" method="post" >
+    
+    {% csrf_token %}
+    <label>{{name}}</label>
+    <div class="mb-3">
+        {{form.as_p}}
+         <div class="form-group">
+            <label for="date">Date worked :</label>
+            <input type="date" id="date" name="date" class="form-control" value={{date}} style="max-width:400px" required>
+        </div>
+        <br>
+          <label for="time">Arrived at: </label>
+        <input type="time" name="time" id="time" value="{{time_value}}"/> 
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+ 
+
+{% endblock %}
+ 
