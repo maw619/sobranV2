@@ -61,9 +61,10 @@ def home(request):
     result = request.GET.get('employee_name')
     if result is not None:
         print(result)
-        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) and Q(co_fk_em_id_key__em_name__icontains=result)) 
-    else:
-        sout = SoOut.objects.filter(co_date__range=[start_date, end_date])
+        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) | Q(co_fk_em_id_key__em_name__icontains=result)) 
+        print(sout.query)
+    else: 
+        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]))
 
 
     # employee_name = request.GET.get('employee_name')
@@ -75,6 +76,7 @@ def home(request):
 
 
     # sout = SoOut.objects.filter(co_date=str(today))
+    #sout = SoOut.objects.all()
     sout.order_by('-co_date')
 
     emp = SoEmployee.objects.all()
@@ -94,7 +96,7 @@ def home(request):
             zone = form.instance.co_fk_em_id_key
            
             print("zone: ", zone)
-            if zone == 1:
+            if zone == 2:
                 time = y_start
             else:
                 time = r_start  
@@ -159,56 +161,57 @@ def delete_so_out(request, pk):
     messages.success(request, "deleted successfully")
     return redirect('home')
 
-
  
-def update_so_out(request, pk): 
-    sout = SoOut.objects.get(co_id_key=pk)
+
+def update_so_out(request, pk):
+    emp = SoEmployee.objects.all()
     shift = Shift.objects.all()
-    date_value = request.POST.get('date')
-    date_obj = datetime.strptime(str(sout.co_date), '%Y-%m-%d').date()
-    print("time from database", sout.co_time_arrived.strftime('%H:%M'))
-    print("date from database", sout.co_date)   
-    print("date from object", date_obj)   
     for x in shift:
         y_start = x.yellow_start
-        r_start = x.red_start 
-         
-    form = UpdateoOutsForm(instance=sout) 
+        r_start = x.red_start
+    sout = SoOut.objects.get(co_id_key=pk)
+    form = UpdateoOutsForm(request.POST or None, instance=sout) 
     if request.method == 'POST':
-        form = UpdateoOutsForm(request.POST, instance=sout)
+        employee_name = request.POST.get('co_employee')
+        print("employee name: ", employee_name)
+        if form.is_valid():
+            #form values
+            time_arrived = form.instance.co_time_arrived 
+            type = form.instance.co_fk_type_id_key.description 
+            zone = form.instance.co_fk_em_id_key
+           
+            print("zone: ", zone)
+            if zone == 2:
+                time = y_start
+            else:
+                time = r_start  
 
-        print("time arrived: ", form.instance.co_time_arrived)
-        form.save()
-        zone = form.instance.co_fk_em_id_key.em_zone
-        if zone == 1:
-            time = y_start
-        else:
-            time = r_start  
+            #get employee name from form and assign it to the instance
+            employee_name = request.POST.get('co_employee') 
+            form.instance.co_fk_em_id_key.em_name = employee_name
 
-        time_value = request.POST.get('time')
-        if time_value == "":
-            time_obj = None
-        else:
-            time_obj = datetime.strptime(time_value, '%H:%M').time()
-        date_value = request.POST.get('date')
-        date_obj = datetime.strptime(date_value, '%Y-%m-%d').date()
-        print("date obj: ", date_obj)
-        form.instance.co_date = date_obj
-        form.instance.co_time_arrived = time_obj
-            
-        form.save()  
-        if time_obj is not None:
-            time_diff = datetime.combine(datetime.today(), time_obj) - datetime.combine(datetime.today(), time) 
-        else:
-            time_diff = None
-        form.instance.co_time_dif = str(time_diff)[0:4]
-        print("time diff: ", form.instance.co_time_dif)
-        form.save()  
-        return redirect('home')
-    context = {'time': form.instance.co_time_arrived, 'name': form.instance.co_fk_em_id_key, 'date': str(sout.co_date) , 'time_value': sout.co_time_arrived.strftime('%H:%M'),'form': form}
+            #check type of absence
+            if type == "Vacation" or type == "Call-out" or type == "Left early":
+                form.instance.co_time_arrived = None
+                form.instance.co_time_dif = None 
+                form.save()
+                messages.success(request, f"Marked as {type}")
+                return redirect('home') 
+            else:  
+                form.save()  
+                if form.instance.co_time_arrived is not None:
+                    time_diff = datetime.combine(datetime.today(), time_arrived ) - datetime.combine(datetime.today(), time) 
+                else:
+                    time_diff = None
+                form.instance.co_time_dif = str(time_diff)[0:4] 
+                form.save() 
+                return redirect('home') 
+    context = {'form2': form, 'sout': sout}
     return render(request, 'update_co.html', context)
- 
 
+ 
+  
+ 
 
 @login_required(login_url='login')
 def add_sout_manually(request):
@@ -228,7 +231,7 @@ def add_sout_manually(request):
         print("time arrived: ", form.instance.co_time_arrived)
         form.save()
         zone = form.instance.co_fk_em_id_key.em_zone
-        if zone == 1:
+        if zone == 2:
             time = y_start
         else:
             time = r_start  

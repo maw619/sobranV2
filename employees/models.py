@@ -26,8 +26,7 @@ class SoOut(models.Model):
     class Meta:
         managed = True
         db_table = 'so_outs'
-        verbose_name = 'SO Out'
-        verbose_name_plural = 'SO Outs'
+        verbose_name = 'SO Out' 
         #ordering = ('-co_date', '-co_time_arrived')
 
     def __str__(self) -> str:

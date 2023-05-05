@@ -1,26 +1,47 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 
 {% block content %}
 
-<form action="" method="post" >
-    
+<form action="" method="post">
+
     {% csrf_token %}
-    <label>{{name}}</label>
-    <div class="mb-3">
-        {{form.as_p}}
-         <div class="form-group">
+    <label style="font-size: larger;">Employee Name: <b>{{name}}</b></label>
+    <div class="mb-3" style="max-width: 300px;">
+        {{form2.as_table}} 
+        <div class="form-group">
             <label for="date">Date worked :</label>
-            <input type="date" id="date" name="date" class="form-control" value={{date}} style="max-width:400px" required>
+            <input type="date" id="date" name="date" class="form-control" value={{date}} style="max-width:400px"
+            required>
         </div>
         <br>
-          <label for="time">Arrived at: </label>
-        <input type="time" name="time" id="time" value="{{time_value}}"/> 
+        <label for="time">Arrived at: </label>
+        <input type="time" name="time" id="time" value="{{time_value}}" />
     </div>
     
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 
- 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+            $('#id_co_fk_type_id_key').on('change', function () {
+                var optionSelected = $(this).find("option:selected");
+                var valueSelected = optionSelected.val();
+
+                if (valueSelected == 2 || valueSelected == 3) {
+                    console.log("vacation selected");
+                    $('#time').val('');
+                }
+            });
+        });
+
+</script>
+
+<!-- <select name="type" id="type" class="form-control"> 
+    {% for x in so_type %}
+    <option value="{{x}}">{{x}}</option>
+    {% endfor %}
+</select> -->
 
 {% endblock %}
- 
+
