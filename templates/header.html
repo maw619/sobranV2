@@ -22,10 +22,26 @@
 
     <!-- Custom styles for this page -->
     <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
-       <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
+
+
+
+    <style>
+
+        #hidden-search-form-icon {
+                display: none;
+            }
+        @media (max-width: 768px) {
+            #date_range_form_sidebar {
+                display: none;
+            }
+            #hidden-search-form-icon {
+                display: block;
+            }
+        }
+
+    
+    </style>
 </head>
- 

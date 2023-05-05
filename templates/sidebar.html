@@ -32,7 +32,7 @@
       <input type="date" id="end" name="end_date" id="end_input" class="form-control" />
       </div>
       <div class="form-group">
-      <label for="name"style="color: white">Employee</label>
+      <label for="name" style="color: white">Employee</label>
           <select name="employee_name" id="employee_name" class="form-control">
             <option value="" disabled selected>Select Employee</option>
             {% for x in emp %}
@@ -41,7 +41,7 @@
           </select>
       </div>
       <div class="form-group">
-        <label for="name">Name</label>
+        <label for="name" style="color: white">Name</label>
         <select name="employee_type" id="employee_type" class="form-control">
           <option value="" disabled selected>Select Type</option>
           {% for x in type %}
@@ -72,3 +72,17 @@
     <button class="rounded-circle border-0" id="sidebarToggle"></button>
   </div>
 </ul>
+
+ 
+<script>
+  const startDate = document.getElementById('start');
+  const endDate = document.getElementById('end');
+
+  // Add an event listener to the start date input
+  startDate.addEventListener('input', () => {
+    endDate.value = startDate.value; // set the end date input to the value of the start date input
+  });
+</script>
+
+
+</script>

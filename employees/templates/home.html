@@ -2,20 +2,12 @@
 
 {% block content %}
 
-{% comment %} <a href="{% url 'dates' %}">go to datwa</a> {% endcomment %}
+
 
  
-
-
-<form id="date_range_form" class="form-inline mb-5">
-    <label for="birthday">start</label>
-    <input type="date" value={{date_today}} name="start_date" class="form-control">
-    <label for="birthday">end</label>
-    <input type="date"  name="end_date" id="end_input" class="form-control"> 
-</form>
-
-<a href="" data-toggle="modal" data-target="#advancedSearchModal" name="modal_submit" id="modal_submit">advanced search</a>
-
+<i class="fa fa-search-plus fa-2x" style="color:#4e73df" data-toggle="modal" data-target="#advancedSearchModal" id="hidden-search-form-icon" aria-hidden="true"> Search</i>
+ <br>
+ 
 <div class="card shadow mb-4">
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary"> {{ date_range_label}}</h6>
@@ -86,7 +78,8 @@
                                         </div>
                                          <div class="container">
                                            {% include 'add_transaction_form.html' %}
-                                         </div>  
+                                         </div> 
+                                         <br><br> 
                                     </div>
                                 </div>
                             </div>
@@ -100,50 +93,52 @@
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">Add Transaction</h5>
+                                            <h5 class="modal-title m-auto" id="exampleModalLabel">Search Reports</h5>
                                                      
                                         </div>
                                          <div class="container">
-                                           <form action="" id="date_range_form_sidebar" class="px-3">
-                                                <div class="form-group">
-                                                <label for="start" style="color: white">start</label>
-                                                <input
-                                                    type="date"
-                                                    id="start"
-                                                    value="{{date_today}}"
-                                                    name="start_date"
-                                                    class="form-control"
-                                                />
-                                                <label for="end" style="color: white"> end</label>
-                                                <input
-                                                    type="date"
-                                                    id="end"
-                                                    name="end_date"
-                                                    id="end_input"
-                                                    class="form-control"
-                                                />
-                                                <label for="name">Name</label>
-                                                <select name="employee_name" id="employee_name" class="form-control" required>
+                                                                       <!-- hidden div-->
+                                            <form action="" id="date_range_form_home" class="p-3">
+                                            <div class="form-group">
+                                            <label for="start" >Start Date</label>
+                                            <input type="date" id="start" value="{{date_today}}" name="start_date" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                            <label for="end" >End Date</label>
+                                            <input type="date" id="end" name="end_date" id="end_input" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                            <label for="name" >Employee</label>
+                                                <select name="employee_name" id="employee_name" class="form-control">
                                                     <option value="" disabled selected>Select Employee</option>
                                                     {% for x in emp %}
-                                                    <option value="{{x.em_name}}" >{{x.em_name}}</option>
+                                                    <option value="{{x.em_name}}">{{x.em_name}}</option>
                                                     {% endfor %}
                                                 </select>
+                                            </div>
+                                            <div class="form-group">
                                                 <label for="name">Name</label>
-                                                <select name="employee_type" id="employee_type" class="form-control" required>
-                                                    <option value="" disabled selected>Select Type</option>
-                                                    {% for x in type %}
-                                                    <option value="{{x}}" >{{x}}</option>
-                                                    {% endfor %}
+                                                <select name="employee_type" id="employee_type" class="form-control">
+                                                <option value="" disabled selected>Select Type</option>
+                                                {% for x in type %}
+                                                <option value="{{x}}">{{x}}</option>
+                                                {% endfor %}
                                                 </select>
-                                                </div>
+                                            </div>
 
-                                                <button type="submit" class="btn btn-primary" id="modal_submit" name="modal_submit">Search</button>
-                                                <a href="{% url 'home' %}" type="submit" class="btn btn-primary">Reset</a>
-                                            </form>
+                                            <button type="submit" class="btn btn-primary" id="sidebar_submit" name="sidebar_submit">Search</button>
+                                            <a href="{% url 'home' %}" type="submit" class="btn btn-primary">Reset</a>
+                                            
+                                        </form>
+
 
                                          </div>  
                                     </div>
                                 </div>
                             </div>
+
+
+
+
+
 {% endblock content %}
