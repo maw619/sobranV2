@@ -19,8 +19,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 
     
-{% comment %} <script>
-    $(document).ready(function () {
+ 
+     <!-- <script>
+      function doSomethingOnResize() {
+        if (window.matchMedia("(max-width: 600px)").matches) {
+             $(document).ready(function () {
         // This code will execute on page load
         $("body").toggleClass("sidebar-toggled");
         $(".sidebar").toggleClass("toggled");
@@ -28,8 +31,41 @@
             $('.sidebar .collapse').collapse('hide');
         };
     });
-</script> {% endcomment %}
+          console.log("Small screen");
+        } else {
+          // execute script for larger screens
+          console.log("Large screen");
+        }
+      }
 
+      // Call the function initially
+      doSomethingOnResize();
+
+      // Call the function every time the window is resized
+      window.addEventListener("resize", doSomethingOnResize);
+    </script> -->
+
+ <script>
+let startDate2 = document.getElementById('start2');
+let endDate2 = document.getElementById('end2');
+
+// Add an event listener to the start date input
+startDate2.addEventListener('input', () => {
+    endDate2.value = startDate2.value; // set the end date input to the value of the start date input
+});
+</script>
+
+
+<script>
+  let startDate = document.getElementById('start');
+  let endDate = document.getElementById('end');
+
+  // Add an event listener to the start date input
+  startDate.addEventListener('input', () => {
+    endDate.value = startDate.value; // set the end date input to the value of the start date input
+  });
+</script>
+ 
   
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
@@ -45,7 +81,7 @@ $(document).ready(function() {
     $('#dataTable2').DataTable( {
         dom: 'Bfrtip',
         buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
+            'copy', 'excel', 'pdf', 'print'
         ]
     } );
 } );

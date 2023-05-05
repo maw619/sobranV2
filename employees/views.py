@@ -7,11 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from .forms import DateRangeForm 
 from django.db.models import Q
-
-
-
-
-
+from django.http import HttpResponse
 
 
 def login_user(request):
@@ -31,11 +27,20 @@ def login_user(request):
 
 
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip_address = x_forwarded_for.split(',')[0]
+    else:
+        ip_address = request.META.get('REMOTE_ADDR')
+    return ip_address
+
  
 
 
 @login_required(login_url='login')
 def home(request):
+    print(get_client_ip(request))
     today = date.today()
     type = SoType.objects.all()
     start_date = request.GET.get('start_date')
@@ -60,15 +65,46 @@ def home(request):
     
     employee_name = request.GET.get('employee_name')
     employee_type = request.GET.get('employee_type')
+    check = request.GET.get('check')
+    print("check: ", check)
     if employee_name is not None and employee_type is not None:
         print(employee_name)
         sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) & Q(co_fk_em_id_key__em_name__exact=employee_name) & Q(co_fk_type_id_key__description__exact=employee_type)) 
         print(f"results with employee name {employee_name} and Type {employee_type} found {sout.count()} results")
         
-    elif employee_name is not None: 
+    elif employee_name is not None and check is None:
+        print("check: ", check) 
+        date_range_label = f"Transactions for {employee_name} for {today}"
         #sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]))
         sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) & Q(co_fk_em_id_key__em_name__exact=employee_name)) 
         print(f"results with employee name {employee_name}  found {sout.count()} results")
+    elif employee_name is not None and check == "on":
+        print("check: ", check)
+        date_range_label = f"All Transactions for {employee_name}"
+        sout = SoOut.objects.filter(Q(co_fk_em_id_key__em_name__exact=employee_name) & Q(co_date__isnull=False))
+        print(f"results with employee name {employee_name}  found {sout.count()} results")
+    elif employee_name is None and employee_type is not None and check == "on":
+        print("check: ", check)
+        date_range_label = f"Transactions for {employee_type}"
+        sout = SoOut.objects.filter(Q(co_fk_type_id_key__description__exact=employee_type) & Q(co_date__isnull=False))
+    elif employee_type is not None and employee_name is None:
+        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) & Q(co_fk_type_id_key__description__exact=employee_type)) 
+        print("start_date",start_date)
+        print("end_date",end_date)
+        print(f"results with Type {employee_type} found {sout.count()} results")
+    elif employee_type is not None and employee_name is not None:
+        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) & Q(co_fk_em_id_key__em_name__exact=employee_name) & Q(co_fk_type_id_key__description__exact=employee_type)) 
+        print(f"results with employee name {employee_name} and Type {employee_type} found {sout.count()} results || and date ranges specified {start_date} to {end_date}")
+    elif employee_name is not None and employee_type is not None:
+        sout = SoOut.objects.filter(co_fk_em_id_key__em_name__exact=employee_name, co_fk_type_id_key__description__exact=employee_type)
+        print(f"results with employee name {employee_name} and Type {employee_type} found {sout.count()} results || and date ranges not specified")
+    elif employee_type is not None and employee_name is None and start_date is None and end_date is None:
+        sout = SoOut.objects.filter(co_fk_type_id_key__description__exact=employee_type)
+        print(f"results with Type {employee_type} found {sout.count()} results || and date ranges and employee_name not specified either")
+    elif employee_name is not None and check == "on":
+        print("check: ", check)
+        sout = SoOut.objects.filter(Q(co_fk_em_id_key__em_name__exact=employee_name) & Q(co_date__isnull=True))
+         
     else:
         sout = SoOut.objects.filter(co_date__range=[start_date, end_date])
         print(f"results with ranges {start_date} to {end_date} found {sout.count()} results")

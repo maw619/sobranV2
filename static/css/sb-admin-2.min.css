@@ -113,7 +113,7 @@ address {
   font-style: normal;
   line-height: inherit;
 }
- 
+
 dl,
 ol,
 ul {
@@ -505,7 +505,7 @@ pre code {
   .container,
   .container-sm {
     max-width: 540px;
-  }  
+  }
 }
 
 @media (min-width: 768px) {
@@ -514,9 +514,9 @@ pre code {
   .container-sm {
     max-width: 720px;
   }
-    #date_range_form {
+  #date_range_form {
     display: none;
-  }  
+  }
 }
 
 @media (min-width: 992px) {
@@ -526,7 +526,7 @@ pre code {
   .container-sm {
     max-width: 960px;
   }
-    #date_range_form {
+  #date_range_form {
     display: none;
   }
 }
@@ -10307,7 +10307,7 @@ form.user .btn-user {
   95% {
     clip: rect(34px, 9999px, 90px, 0);
   }
-  100% { 
+  100% {
     clip: rect(67px, 9999px, 68px, 0);
   }
 }

@@ -25,11 +25,11 @@
   <form action="" id="date_range_form_sidebar" class="p-3">
     <div class="form-group">
       <label for="start" style="color: white">Start Date</label>
-      <input type="date" id="start" value="{{date_today}}" name="start_date" class="form-control" />
+      <input type="date" id="start" value="{{ None }}" name="start_date" class="form-control" />
       </div>
       <div class="form-group">
       <label for="end" style="color: white">End Date</label>
-      <input type="date" id="end" name="end_date" id="end_input" class="form-control" />
+      <input type="date" id="end" value="{{ None }}" name="end_date" id="end_input" class="form-control" />
       </div>
       <div class="form-group">
       <label for="name" style="color: white">Employee</label>
@@ -49,7 +49,10 @@
           {% endfor %}
         </select>
       </div>
-
+<div class="input-group-text">
+      <input type="checkbox" name="check" aria-label="Checkbox for following text input">
+        Show All
+    </div>
     <button type="submit" class="btn btn-primary" id="sidebar_submit" name="sidebar_submit">Search</button>
     <a href="{% url 'home' %}" type="submit" class="btn btn-primary">Reset</a>
   </form>
@@ -74,15 +77,7 @@
 </ul>
 
  
-<script>
-  const startDate = document.getElementById('start');
-  const endDate = document.getElementById('end');
 
-  // Add an event listener to the start date input
-  startDate.addEventListener('input', () => {
-    endDate.value = startDate.value; // set the end date input to the value of the start date input
-  });
-</script>
 
 
 </script>

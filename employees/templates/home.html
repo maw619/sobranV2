@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-
-
  
 <i class="fa fa-search-plus fa-2x" style="color:#4e73df" data-toggle="modal" data-target="#advancedSearchModal" id="hidden-search-form-icon" aria-hidden="true"> Search</i>
  <br>
@@ -100,12 +97,12 @@
                                                                        <!-- hidden div-->
                                             <form action="" id="date_range_form_home" class="p-3">
                                             <div class="form-group">
-                                            <label for="start" >Start Date</label>
-                                            <input type="date" id="start" value="{{date_today}}" name="start_date" class="form-control" />
+                                            <label for="start2" >Start Date</label>
+                                            <input type="date" id="start2" value="{{date_today}}" name="start_date" class="form-control" />
                                             </div>
                                             <div class="form-group">
-                                            <label for="end" >End Date</label>
-                                            <input type="date" id="end" name="end_date" id="end_input" class="form-control" />
+                                            <label for="end2" >End Date</label>
+                                            <input type="date" id="end2" name="end_date" id="end_input" class="form-control" />
                                             </div>
                                             <div class="form-group">
                                             <label for="name" >Employee</label>
@@ -128,7 +125,7 @@
 
                                             <button type="submit" class="btn btn-primary" id="sidebar_submit" name="sidebar_submit">Search</button>
                                             <a href="{% url 'home' %}" type="submit" class="btn btn-primary">Reset</a>
-                                            
+                                           
                                         </form>
 
 
@@ -140,5 +137,6 @@
 
 
 
-
+   <!--  auto set dates form start to end form  -->                        
+ 
 {% endblock content %}
