@@ -1,12 +1,6 @@
-<ul
-  class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
-  id="accordionSidebar"
->
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
   <!-- Sidebar - Brand -->
-  <a
-    class="sidebar-brand d-flex align-items-center justify-content-center"
-    href="{% url 'home' %}"
-  >
+  <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'home' %}">
     <div class="sidebar-brand-icon">
       <!--  <i class="fas fa-laugh-wink"></i> -->
       {% load static %}
@@ -22,52 +16,52 @@
   <li class="nav-item">
     <a class="nav-link" href="{%  url 'admin:index' %}">
       <i class="fas fa-fw fa-tachometer-alt"></i>
-      <span>Admin Panel</span></a
-    >
+      <span>Admin Panel</span></a>
   </li>
 
   <!-- Divider -->
   <hr class="sidebar-divider d-none d-md-block" />
 
-  <form action="" id="date_range_form_sidebar" class="px-3">
+  <form action="" id="date_range_form_sidebar" class="p-3">
     <div class="form-group">
-      <label for="start" style="color: white">start</label>
-      <input
-        type="date"
-        id="start"
-        value="{{date_today}}"
-        name="start_date"
-        class="form-control"
-      />
-      <label for="end" style="color: white"> end</label>
-      <input
-        type="date"
-        id="end"
-        name="end_date"
-        id="end_input"
-        class="form-control"
-      />
-      <label for="name">Name</label>
-      <select name="employee_name" id="employee_name" class="form-control">
-        <option value="all">Employee</option>
-        {% for x in emp %}
-        <option value="{{x.em_name}}">{{x.em_name}}</option>
-        {% endfor %}
-      </select>
-    </div>
+      <label for="start" style="color: white">Start Date</label>
+      <input type="date" id="start" value="{{date_today}}" name="start_date" class="form-control" />
+      </div>
+      <div class="form-group">
+      <label for="end" style="color: white">End Date</label>
+      <input type="date" id="end" name="end_date" id="end_input" class="form-control" />
+      </div>
+      <div class="form-group">
+      <label for="name"style="color: white">Employee</label>
+          <select name="employee_name" id="employee_name" class="form-control">
+            <option value="" disabled selected>Select Employee</option>
+            {% for x in emp %}
+            <option value="{{x.em_name}}">{{x.em_name}}</option>
+            {% endfor %}
+          </select>
+      </div>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <select name="employee_type" id="employee_type" class="form-control">
+          <option value="" disabled selected>Select Type</option>
+          {% for x in type %}
+          <option value="{{x}}">{{x}}</option>
+          {% endfor %}
+        </select>
+      </div>
 
-    <button type="submit" class="btn btn-primary">Search</button>
+    <button type="submit" class="btn btn-primary" id="sidebar_submit" name="sidebar_submit">Search</button>
     <a href="{% url 'home' %}" type="submit" class="btn btn-primary">Reset</a>
   </form>
 
-    <!-- Divider -->
+  <!-- Divider -->
   <hr class="sidebar-divider d-none d-md-block" />
-  
-<li class="nav-item">
-                <a class="nav-link" href="#" data-toggle="modal" data-target="#addTransactionModal">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Add Transaction</span></a>
-            </li>
+
+  <li class="nav-item">
+    <a class="nav-link" href="#" data-toggle="modal" data-target="#addTransactionModal">
+      <i class="fas fa-fw fa-table"></i>
+      <span>Add Transaction</span></a>
+  </li>
 
   <!-- Sidebar Toggler (Sidebar)  data-toggle="modal" data-target="#addTransactionModal"-->
   <br />

@@ -37,6 +37,7 @@ def login_user(request):
 @login_required(login_url='login')
 def home(request):
     today = date.today()
+    type = SoType.objects.all()
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     end_date_datetime = ""
@@ -57,26 +58,22 @@ def home(request):
 
         date_range_label = f"Transactions for {start_date_formatted} to {end_date_formatted}"
     
+    employee_name = request.GET.get('employee_name')
+    employee_type = request.GET.get('employee_type')
+    if employee_name is not None and employee_type is not None:
+        print(employee_name)
+        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) & Q(co_fk_em_id_key__em_name__exact=employee_name) & Q(co_fk_type_id_key__description__exact=employee_type)) 
+        print(f"results with employee name {employee_name} and Type {employee_type} found {sout.count()} results")
+        
+    elif employee_name is not None: 
+        #sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]))
+        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) & Q(co_fk_em_id_key__em_name__exact=employee_name)) 
+        print(f"results with employee name {employee_name}  found {sout.count()} results")
+    else:
+        sout = SoOut.objects.filter(co_date__range=[start_date, end_date])
+        print(f"results with ranges {start_date} to {end_date} found {sout.count()} results")
     
-    result = request.GET.get('employee_name')
-    if result is not None:
-        print(result)
-        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) | Q(co_fk_em_id_key__em_name__icontains=result)) 
-        print(sout.query)
-    else: 
-        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]))
-
-
-    # employee_name = request.GET.get('employee_name')
-
-    # if employee_name:
-    #     sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) and Q(co_fk_em_id_key__em_name__exact=employee_name))
-    # else:
-    #     sout = SoOut.objects.filter(co_date__range=[start_date, end_date], co_fk_em_id_key__em_name__isnull=False)
-
-
-    # sout = SoOut.objects.filter(co_date=str(today))
-    #sout = SoOut.objects.all()
+    #sout = SoOut.objects.filter(co_date=str(today))
     sout.order_by('-co_date')
 
     emp = SoEmployee.objects.all()
@@ -122,7 +119,7 @@ def home(request):
                 form.save() 
                 return redirect('home') 
            
-    context = {'sout': sout, 'emp': emp, 'form':form, 'date_today': datetime.today().date(),'date_range_label': date_range_label, 'date_value':str(end_date_datetime)}
+    context = {'sout': sout, 'emp': emp, 'form':form, 'date_today': datetime.today().date(),'date_range_label': date_range_label, 'date_value':str(end_date_datetime), 'type': type}
     return render(request, 'home.html', context)
 
 
@@ -176,7 +173,7 @@ def update_so_out(request, pk):
         print("employee name: ", employee_name)
         if form.is_valid():
             #form values
-            time_arrived = form.instance.co_time_arrived 
+            time_arrived = request.POST.get('time')
             type = form.instance.co_fk_type_id_key.description 
             zone = form.instance.co_fk_em_id_key
            
@@ -198,9 +195,13 @@ def update_so_out(request, pk):
                 messages.success(request, f"Marked as {type}")
                 return redirect('home') 
             else:  
-                form.save()  
-                if form.instance.co_time_arrived is not None:
-                    time_diff = datetime.combine(datetime.today(), time_arrived ) - datetime.combine(datetime.today(), time) 
+                  
+                if time_arrived is not None:
+                    print("time_arrived:  ",time_arrived)
+                    time_arrived_formatted = datetime.strptime(time_arrived, '%H:%M').time()
+                    print("time_arrived_formatted:  ",time_arrived_formatted)
+                    time_diff = datetime.combine(datetime.today(), time_arrived_formatted ) - datetime.combine(datetime.today(), time) 
+                    form.instance.co_time_arrived = time_arrived_formatted
                 else:
                     time_diff = None
                 form.instance.co_time_dif = str(time_diff)[0:4] 

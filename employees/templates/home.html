@@ -14,6 +14,7 @@
     <input type="date"  name="end_date" id="end_input" class="form-control"> 
 </form>
 
+<a href="" data-toggle="modal" data-target="#advancedSearchModal" name="modal_submit" id="modal_submit">advanced search</a>
 
 <div class="card shadow mb-4">
                                 <div class="card-header py-3">
@@ -60,8 +61,8 @@
                                                 <td>{{x.co_time_arrived}}</td>
                                                 <td>{{x.co_time_dif}}</td>
                                                 {% endif %}
-                                            
-                                                <td><a href="{% url 'update_so_out' x.co_id_key %}" ><i class="fa fa-pen"></i></a></td>
+                                                                                            
+                                                <td><a href="{% url 'update_so_out' x.co_id_key %}" ><i class="fa fa-pen-alt"></i></a></td>
                                                 <td><a href="{% url 'delete_so_out' x.co_id_key %}" style="color:red"><i class="fa fa-trash"></i></a></td>
                   
                                             </tr>
@@ -74,7 +75,7 @@
 
 
 
-                                                        <!-- Logout Modal  data-toggle="modal" data-target="#addTransactionModal"-->
+                                                        <!-- transaction Modal  data-toggle="modal" data-target="#addTransactionModal"-->
                             <div class="modal fade" id="addTransactionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                                 aria-hidden="true">
                                 <div class="modal-dialog" role="document">
@@ -85,6 +86,62 @@
                                         </div>
                                          <div class="container">
                                            {% include 'add_transaction_form.html' %}
+                                         </div>  
+                                    </div>
+                                </div>
+                            </div>
+                                            
+                            
+                            
+                            
+                            <!-- advancedSearchModal Modal  data-toggle="modal" data-target="#advancedSearchModal"-->
+                            <div class="modal fade" id="advancedSearchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Add Transaction</h5>
+                                                     
+                                        </div>
+                                         <div class="container">
+                                           <form action="" id="date_range_form_sidebar" class="px-3">
+                                                <div class="form-group">
+                                                <label for="start" style="color: white">start</label>
+                                                <input
+                                                    type="date"
+                                                    id="start"
+                                                    value="{{date_today}}"
+                                                    name="start_date"
+                                                    class="form-control"
+                                                />
+                                                <label for="end" style="color: white"> end</label>
+                                                <input
+                                                    type="date"
+                                                    id="end"
+                                                    name="end_date"
+                                                    id="end_input"
+                                                    class="form-control"
+                                                />
+                                                <label for="name">Name</label>
+                                                <select name="employee_name" id="employee_name" class="form-control" required>
+                                                    <option value="" disabled selected>Select Employee</option>
+                                                    {% for x in emp %}
+                                                    <option value="{{x.em_name}}" >{{x.em_name}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <label for="name">Name</label>
+                                                <select name="employee_type" id="employee_type" class="form-control" required>
+                                                    <option value="" disabled selected>Select Type</option>
+                                                    {% for x in type %}
+                                                    <option value="{{x}}" >{{x}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                </div>
+
+                                                <button type="submit" class="btn btn-primary" id="modal_submit" name="modal_submit">Search</button>
+                                                <a href="{% url 'home' %}" type="submit" class="btn btn-primary">Reset</a>
+                                            </form>
+
                                          </div>  
                                     </div>
                                 </div>
