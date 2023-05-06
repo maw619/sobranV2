@@ -46,7 +46,8 @@ class SoType(models.Model):
 class Shift(models.Model):
     yellow_start = models.TimeField(blank=True, null=True, verbose_name='Yellow Zone Start', default=time(hour=6, minute=15))
     red_start = models.TimeField(blank=True, null=True, verbose_name='Red Zone Start', default=time(hour=5, minute=00))
-
+    green_start = models.TimeField(blank=True, null=True, verbose_name='Green Zone Start', default=time(hour=4, minute=45))
+    
     class Meta:
         managed = True
         db_table = 'shiftstart'

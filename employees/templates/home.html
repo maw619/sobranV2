@@ -39,7 +39,7 @@
                                             {% for x in sout %}
                                             <tr>
                                                 {% comment %} <td><a href="{% url 'view_transaction' x.co_id_key %}">{{x.co_fk_em_id_key.em_name}}</a> </td> {% endcomment %}
-                                                <td><a href="">{{x.co_fk_em_id_key.em_name}}</a> </td>
+                                                <td><a href="{% url 'view_transaction' x.co_id_key %}" >{{x.co_fk_em_id_key.em_name}}</a> </td>
                                                 <td>{{x.co_fk_type_id_key}}</td>
                                                 <td>{{x.co_date}}</td> 
                                             
@@ -122,12 +122,47 @@
                                                 {% endfor %}
                                                 </select>
                                             </div>
-
+                                               <div class="input-group-text" style="background:#fff; border:0; color:#000">
+                                                    <input type="checkbox" name="check" aria-label="Checkbox for following text input">
+                                                    Show All
+                                               </div>
                                             <button type="submit" class="btn btn-primary" id="sidebar_submit" name="sidebar_submit">Search</button>
                                             <a href="{% url 'home' %}" type="submit" class="btn btn-primary">Reset</a>
                                            
                                         </form>
 
+
+                                         </div>  
+                                    </div>
+                                </div>
+                            </div>
+                         
+                         
+                         
+                         
+                            <!-- infoModal Modal  data-toggle="modal" data-target="#infoModal"-->
+                            <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title m-auto" id="exampleModalLabel">information</h5>
+                                                     
+                                        </div>
+                                         <div class="container">
+                                         
+                                            <table>
+                                            <tr><td>Name</td>
+                                                <td>Type</td>
+                                                <td>Zone</td>
+                                                
+                                            </tr>
+                                            <tr>
+                                            <td>{{name}}</td>
+                                            <td>{{so_type}}</td>
+                                            <td>{{zone}}</td>
+                                            </tr>
+                                            </table>
 
                                          </div>  
                                     </div>

@@ -74,49 +74,55 @@ def home(request):
         
     elif employee_name is not None and check is None:
         print("check: ", check) 
-        date_range_label = f"Transactions for {employee_name} for {today}"
         #sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]))
         sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) & Q(co_fk_em_id_key__em_name__exact=employee_name)) 
-        print(f"results with employee name {employee_name}  found {sout.count()} results")
+        date_range_label = f"Transactions for {employee_name} for {today.strftime('%B %d, %Y')} | found {sout.count()} results"
+        print(f"results with employee name {employee_name} | found {sout.count()} results")
     elif employee_name is not None and check == "on":
         print("check: ", check)
-        date_range_label = f"All Transactions for {employee_name}"
         sout = SoOut.objects.filter(Q(co_fk_em_id_key__em_name__exact=employee_name) & Q(co_date__isnull=False))
+        date_range_label = f"All Transactions for {employee_name} | found {sout.count()} results"
         print(f"results with employee name {employee_name}  found {sout.count()} results")
     elif employee_name is None and employee_type is not None and check == "on":
         print("check: ", check)
-        date_range_label = f"Transactions for {employee_type}"
         sout = SoOut.objects.filter(Q(co_fk_type_id_key__description__exact=employee_type) & Q(co_date__isnull=False))
+        date_range_label = f"Transactions for {employee_type} | found {sout.count()} results"
     elif employee_type is not None and employee_name is None:
-        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) & Q(co_fk_type_id_key__description__exact=employee_type)) 
-        print("start_date",start_date)
-        print("end_date",end_date)
-        print(f"results with Type {employee_type} found {sout.count()} results")
+        sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) & Q(co_fk_type_id_key__description__exact=employee_type))  
+        date_range_label = f"Transactions for {employee_type} for {start_date} to {end_date} | found {sout.count()} results" 
     elif employee_type is not None and employee_name is not None:
         sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) & Q(co_fk_em_id_key__em_name__exact=employee_name) & Q(co_fk_type_id_key__description__exact=employee_type)) 
-        print(f"results with employee name {employee_name} and Type {employee_type} found {sout.count()} results || and date ranges specified {start_date} to {end_date}")
+        date_range_label = f"Transactions for {employee_name} and Type {employee_type} found {sout.count()} results || and date ranges specified {start_date} to {end_date} | found {sout.count()} results"
     elif employee_name is not None and employee_type is not None:
         sout = SoOut.objects.filter(co_fk_em_id_key__em_name__exact=employee_name, co_fk_type_id_key__description__exact=employee_type)
-        print(f"results with employee name {employee_name} and Type {employee_type} found {sout.count()} results || and date ranges not specified")
+        date_range_label = f"Transactions for {employee_name} and Type {employee_type} found {sout.count()} results || and date ranges not specified | found {sout.count()} results"
     elif employee_type is not None and employee_name is None and start_date is None and end_date is None:
         sout = SoOut.objects.filter(co_fk_type_id_key__description__exact=employee_type)
-        print(f"results with Type {employee_type} found {sout.count()} results || and date ranges and employee_name not specified either")
+        date_range_label = f"Transactions for Type ({employee_type}) found {sout.count()} results || and date ranges and employee_name not specified either | found {sout.count()} results"
     elif employee_name is not None and check == "on":
         print("check: ", check)
         sout = SoOut.objects.filter(Q(co_fk_em_id_key__em_name__exact=employee_name) & Q(co_date__isnull=True))
-         
+        date_range_label = f"Transactions for {employee_name} for {start_date} | found {sout.count()} results"
+    elif start_date is today and end_date is today and check == "on":
+        sout = SoOut.objects.all()
     else:
         sout = SoOut.objects.filter(co_date__range=[start_date, end_date])
-        print(f"results with ranges {start_date} to {end_date} found {sout.count()} results")
+        date_range_label = f"Transactions for {start_date} | found {sout.count()} results"
     
     #sout = SoOut.objects.filter(co_date=str(today))
     sout.order_by('-co_date')
 
     emp = SoEmployee.objects.all()
+    emp.order_by('-em_name')
     shift = Shift.objects.all()
     for x in shift:
         y_start = x.yellow_start
         r_start = x.red_start
+        g_start = x.green_start
+
+    print("y_start", y_start)
+    print("red_start", r_start)
+    print("green_start", g_start)
 
     form = SoOutForm(request.POST or None, initial={'co_time_arrived': datetime.now().time(), 'co_date': date.today()}) 
     if request.method == 'POST':
@@ -126,13 +132,16 @@ def home(request):
             #form values
             time_arrived = form.instance.co_time_arrived 
             type = form.instance.co_fk_type_id_key.description 
-            zone = form.instance.co_fk_em_id_key
+            zone = form.instance.co_fk_em_id_key.em_zone
            
             print("zone: ", zone)
             if zone == 2:
                 time = y_start
+            elif zone == 3:
+                time = g_start
             else:
-                time = r_start  
+                time = r_start
+ 
 
             #get employee name from form and assign it to the instance
             employee_name = request.POST.get('co_employee') 
@@ -181,70 +190,67 @@ def date_range_view(request):
 
 
 
-def delete_so_out(request, pk):
-    # if request.user.is_authenticated:
-    #     sout = SoOut.objects.get(co_id_key=pk)
-    #     sout.delete()
-    #     messages.success(request, "deleted successfully")
-    # else:
-    #     messages.success(request, "You need to be logged in")
-
+def delete_so_out(request, pk): 
     sout = SoOut.objects.get(co_id_key=pk)
     sout.delete()
     messages.success(request, "deleted successfully")
     return redirect('home')
 
  
-
 def update_so_out(request, pk):
     emp = SoEmployee.objects.all()
     shift = Shift.objects.all()
     for x in shift:
         y_start = x.yellow_start
         r_start = x.red_start
+        g_start = x.green_start
+
     sout = SoOut.objects.get(co_id_key=pk)
-    form = UpdateoOutsForm(request.POST or None, instance=sout) 
+    print(sout.co_date)
+    employee_name = request.POST.get('co_employee')
+    form = UpdateoOutsForm(request.POST or None, instance=sout)
     if request.method == 'POST':
-        employee_name = request.POST.get('co_employee')
         print("employee name: ", employee_name)
         if form.is_valid():
-            #form values
-            time_arrived = request.POST.get('time')
-            type = form.instance.co_fk_type_id_key.description 
-            zone = form.instance.co_fk_em_id_key
-           
-            print("zone: ", zone)
+            # form values
+            time_arrived = form.cleaned_data['co_time_arrived']
+            type = form.instance.co_fk_type_id_key.description
+            zone = form.instance.co_fk_em_id_key.em_zone
+            print(f"zone for {form.instance.co_fk_em_id_key}: ", zone)
+
             if zone == 2:
                 time = y_start
+            elif zone == 3:
+                time = g_start
             else:
-                time = r_start  
+                time = r_start
 
-            #get employee name from form and assign it to the instance
-            employee_name = request.POST.get('co_employee') 
+            # get employee name from form and assign it to the instance
+            employee_name = request.POST.get('co_employee')
             form.instance.co_fk_em_id_key.em_name = employee_name
 
-            #check type of absence
+            # check type of absence
             if type == "Vacation" or type == "Call-out" or type == "Left early":
                 form.instance.co_time_arrived = None
-                form.instance.co_time_dif = None 
+                form.instance.co_time_dif = None
                 form.save()
                 messages.success(request, f"Marked as {type}")
-                return redirect('home') 
-            else:  
-                  
+                return redirect('home')
+            else:
                 if time_arrived is not None:
-                    print("time_arrived:  ",time_arrived)
-                    time_arrived_formatted = datetime.strptime(time_arrived, '%H:%M').time()
-                    print("time_arrived_formatted:  ",time_arrived_formatted)
-                    time_diff = datetime.combine(datetime.today(), time_arrived_formatted ) - datetime.combine(datetime.today(), time) 
-                    form.instance.co_time_arrived = time_arrived_formatted
+                    print("time_arrived:  ", time_arrived)
+                    form.instance.co_time_arrived = time_arrived
+                    time_diff = datetime.combine(datetime.today(), time_arrived) - datetime.combine(
+                        datetime.today(), time)
                 else:
                     time_diff = None
-                form.instance.co_time_dif = str(time_diff)[0:4] 
-                form.save() 
-                return redirect('home') 
-    context = {'form2': form, 'sout': sout}
+                form.instance.co_time_dif = str(time_diff)[0:4]
+                form.save()
+                return redirect('home')
+    context = {'form2': form, 'name': form.instance.co_fk_em_id_key.em_name}
     return render(request, 'update_co.html', context)
+
+
 
  
   
@@ -259,7 +265,7 @@ def add_sout_manually(request):
     for x in shift:
         y_start = x.yellow_start
         r_start = x.red_start 
-         
+        g_start = x.green_start  
     
     form = UpdateoOutsForm(request.POST or None)
     if request.method == 'POST':
@@ -268,10 +274,14 @@ def add_sout_manually(request):
         print("time arrived: ", form.instance.co_time_arrived)
         form.save()
         zone = form.instance.co_fk_em_id_key.em_zone
+        print("zone: ", zone)
         if zone == 2:
             time = y_start
+        elif zone == 3:
+            time = g_start
         else:
             time = r_start  
+
 
         time_value = request.POST.get('time')
         if time_value == "":
@@ -298,6 +308,14 @@ def add_sout_manually(request):
 
 
 
+
+
+def view_transaction(request, pk):
+    if request.user.is_authenticated:
+        sout = SoOut.objects.get(co_id_key=pk)
+        return render(request, 'transaction.html', {'sout':sout})
+    messages.success(request, "You need to be logged in")
+    return redirect('home')
 
 
 def logout_user(request):

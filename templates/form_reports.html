@@ -1,0 +1,35 @@
+<form action="" id="date_range_form_sidebar" class="p-3">
+    <div class="form-group">
+        <label for="start" style="color: white">Start Date</label>
+        <input type="date" id="start" value="{{ None }}" name="start_date" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="end" style="color: white">End Date</label>
+        <input type="date" id="end" value="{{ None }}" name="end_date" id="end_input" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="name" style="color: white">Employee</label>
+        <select name="employee_name" id="employee_name" class="form-control">
+            <option value="" disabled selected>Select Employee</option>
+            {% for x in emp %}
+            <option value="{{x.em_name}}">{{x.em_name}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="name" style="color: white">Name</label>
+        <select name="employee_type" id="employee_type" class="form-control">
+            <option value="" disabled selected>Select Type</option>
+            {% for x in type %}
+            <option value="{{x}}">{{x}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="input-group-text" style="background:#4e73df; border:0; color:white">
+        <input type="checkbox" name="check" aria-label="Checkbox for following text input">
+        Show All
+    </div>
+    <br>
+    <button type="submit" class="btn btn-primary" id="sidebar_submit" name="sidebar_submit">Search</button>
+    <a href="{% url 'home' %}" type="submit" class="btn btn-primary">Reset</a>
+</form>

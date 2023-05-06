@@ -2,20 +2,15 @@
 
 {% block content %}
 
-<form action="" method="post">
+<form method="post">
 
     {% csrf_token %}
     <label style="font-size: larger;">Employee Name: <b>{{name}}</b></label>
     <div class="mb-3" style="max-width: 300px;">
         {{form2.as_table}} 
-        <div class="form-group">
-            <label for="date">Date worked :</label>
-            <input type="date" id="date" name="date" class="form-control" value={{date}} style="max-width:400px"
-            required>
-        </div>
+        
         <br>
-        <label for="time">Arrived at: </label>
-        <input type="time" name="time" id="time" value="{{time_value}}" />
+   
     </div>
     
     <button type="submit" class="btn btn-primary">Submit</button>
@@ -23,7 +18,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function () {
+    {% comment %} $(document).ready(function () {
             $('#id_co_fk_type_id_key').on('change', function () {
                 var optionSelected = $(this).find("option:selected");
                 var valueSelected = optionSelected.val();
@@ -35,7 +30,7 @@
             });
         });
 
-</script>
+</script> {% endcomment %}
 
 <!-- <select name="type" id="type" class="form-control"> 
     {% for x in so_type %}

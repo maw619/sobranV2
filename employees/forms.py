@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from django import forms
 from .models import SoEmployee, SoOut, SoType, Shift
-
+from django.forms.widgets import DateInput
 
 
 
@@ -27,14 +27,14 @@ class UpdateoOutsForm(ModelForm):
         labels = {
             "co_fk_type_id_key": 'Type',
             'co_fk_em_id_key': "Name", 
-            'co_date': 'asdasdad',
+            'co_date': 'Date',
             'co_time_arrived': 'Time Arrived',
         }
         widgets = { 
             'co_fk_em_id_key': forms.HiddenInput(),
             'co_fk_type_id_key': forms.Select(attrs={'class':'form-control','required': True}), 
-            'co_time_arrived': forms.HiddenInput(),
-            'co_date':  forms.HiddenInput(),
+            'co_time_arrived': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            'co_date': DateInput(attrs={'class':'form-control','type': 'date'}),
             'co_time_dif': forms.HiddenInput()
         } 
 

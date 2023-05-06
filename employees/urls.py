@@ -9,4 +9,5 @@ urlpatterns = [
     path('logout/', views.logout_user, name='logout'),
     path('dates', views.date_range_view, name='dates'),
     path('add_transaction', views.add_sout_manually, name='add_transaction'),
+    path('view_transaction/<pk>', views.view_transaction, name='view_transaction'),
 ]
