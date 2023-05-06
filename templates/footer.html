@@ -77,14 +77,16 @@ startDate2.addEventListener('input', () => {
 
 
 <script>
-$(document).ready(function() {
-    $('#dataTable2').DataTable( {
-        dom: 'Bfrtip',
-        buttons: [
-            'copy', 'excel', 'pdf', 'print'
-        ]
-    } );
-} );
+  $(document).ready(function () {
+    $('#dataTable2').DataTable({
+      dom: 'Blfrtip',
+      buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+      ],
+      lengthMenu: [10, 25, 50, 100], // Specify the available page lengths
+      pageLength: 25 // Set the initial page length
+    });
+  });
 </script>
 
 

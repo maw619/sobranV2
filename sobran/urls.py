@@ -21,3 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include ('employees.urls')),
 ]
+
+admin.site.site_header = "Sobran"

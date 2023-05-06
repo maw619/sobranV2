@@ -10,6 +10,7 @@ class SoEmployee(models.Model):
     class Meta:
         managed = True
         db_table = 'so_employees'
+        ordering = ['em_name']
     def __str__(self) -> str:
         return self.em_name
 
@@ -27,7 +28,7 @@ class SoOut(models.Model):
         managed = True
         db_table = 'so_outs'
         verbose_name = 'SO Out' 
-        #ordering = ('-co_date', '-co_time_arrived')
+        ordering = ['-co_date']
 
     def __str__(self) -> str:
         return str(self.co_fk_em_id_key)
