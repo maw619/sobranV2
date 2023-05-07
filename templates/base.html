@@ -1,174 +1,172 @@
 {% include 'header.html' %}
 
 <body id="page-top">
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+    <!-- Sidebar -->
+    {% include 'sidebar.html' %}
+    <!-- End of Sidebar -->
 
-    <!-- Page Wrapper -->
-    <div id="wrapper">
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+      <!-- Main Content -->
+      <div id="content">
+        <!-- Topbar -->
+        <nav
+          class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow"
+        >
+          <!-- Sidebar Toggle (Topbar) -->
+          <form class="form-inline" id="maform2" name="maform2">
+            <button
+              name="populate_form_submit"
+              type="submit"
+              id="sidebarToggleTop"
+              class="btn btn-link d-md-none rounded-circle mr-3"
+            >
+              <i class="fa fa-bars"></i>
+            </button>
+          </form>
+          {% load static %}
+          <!-- Logo -->
+          {% comment %}
+          <a class="navbar-brand" href="{% url 'home' %}">
+            <img
+              src="{% static 'sobranLogo.png' %}"
+              height="70"
+              alt="your logo"
+            />
+          </a>
+          Sobran {% endcomment %}
+          <!-- Topbar Search -->
 
-        <!-- Sidebar -->
-        {% include 'sidebar.html' %}
-        <!-- End of Sidebar -->
-            
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
+          <!-- Topbar Navbar -->
+          <ul class="navbar-nav ml-auto">
+            <!-- Nav Item - Search Dropdown (Visible Only XS) -->
 
-            <!-- Main Content -->
-            <div id="content">
+            <div class="topbar-divider d-none d-sm-block"></div>
 
+            {% load static %}
+            <!-- Nav Item - User Information -->
+            <li class="nav-item dropdown no-arrow">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="userDropdown"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small"
+                  >logged in as: {{ user.username }}</span
+                >
+                <img
+                  class="img-profile rounded-circle"
+                  src="{% static 'user-logo.png' %}"
+                />
+              </a>
+              <!-- Dropdown - User Information -->
+              <div
+                class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                aria-labelledby="userDropdown"
+              >
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'logout' %}">
+                  <i
+                    class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"
+                  ></i>
+                  Logout
+                </a>
+              </div>
+            </li>
+          </ul>
+        </nav>
+        <!-- End of Topbar -->
 
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+          {% if messages %} {% for message in messages %}
 
-             
+          <div class="alert alert-primary" role="alert" style="width: 65%">
+            {{message}}
+          </div>
 
+          {% endfor %} {% endif %}
 
+          <form action="{% url 'home' %}" method="POST" id="my-form">
+            {% csrf_token %}
 
+            <div class="input-group mb-3">{{form.as_p}}</div>
 
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-              
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <form class="form-inline" id="maform2" name="maform2">
-                        <button name="populate_form_submit" type="submit" id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                            <i class="fa fa-bars"></i>
-                        </button>
-                    </form>
-                    {% load static %}
-                       <!-- Logo -->
-                    {% comment %} <a class="navbar-brand" href="{% url 'home' %}">
-                        <img src="{% static 'sobranLogo.png' %}" height="70" alt="your logo">
-                    </a>
-                    Sobran {% endcomment %}
-                    <!-- Topbar Search -->
-       
+            {% comment %}
+            <select
+              class="form-control"
+              id="single1"
+              name="co_employee"
+              size="1"
+              style="width: 100%"
+            >
+              <label>Employe</label>
+              {% for x in emp %}
+              <option value="{{x.em_name}}">{{x.em_name}}</option>
+              {% endfor %}
+            </select>
+            {% endcomment %}
+          </form>
 
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
+          {% block content %} {% endblock content %}
 
-                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-           
+          <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-                        <div class="topbar-divider d-none d-sm-block"></div>
+          <script>
+            $(document).ready(function () {
+              $("#single1").on("change", function () {
+                $("#my-form").submit();
+              });
+            });
+          </script>
 
-                        {% load static %}
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">logged in as: {{ user.username }}</span>
-                                <img class="img-profile rounded-circle" src="{% static 'user-logo.png' %}">
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                              
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{% url 'logout' %}">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            </div>
-                        </li>
-
-                    </ul>
-
-                </nav>
-                <!-- End of Topbar -->
-
-                <!-- Begin Page Content -->
-                <div class="container-fluid">
-
-         {% if messages %}
-            {% for message in messages %}
-          
-            <div class="alert alert-primary" role="alert" style="width:65%;">
-              {{message}}
-            </div>
-          
-            {% endfor %}
-            {% endif %}
-
-
-
-            
-
-  <form  action="{% url 'home' %}" method="POST" id="my-form">
-                                {% csrf_token %}
-
-<div class="input-group mb-3">
-                                {{form.as_p}}
-</div>
-
-                                 {% comment %} <select class="form-control" id="single1" name="co_employee" size="1"style="width: 100%">
-                                     <label>Employe</label>
-                                    {% for x in emp %}  
-                                    <option value="{{x.em_name}}">{{x.em_name}}</option>
-                                    {% endfor %}
-                                </select>   {% endcomment %}
-
-
- 
-
-                            </form>
-
- 
-{% block content %}
-{% endblock content %}
-                
-                   
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    $(document).ready(function() {
-        $('#single1').on('change', function() {
-            $('#my-form').submit();
-        });
-    });
-</script>
-
-<script>
-    $(document).ready(function() {
-        $('#single1').on('change', function() {
-            $('#my-form').submit();
-        });
-    });
-</script>
-<script>
-    $(document).ready(function() {
-        $('#end_input').on('change', function() {
-            $('#date_range_form').submit();
-        });
-    });
-</script>
-
-  
-                </div>
-                <!-- /.container-fluid -->
-
-            </div>
-            <!-- End of Main Content -->
-
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Sobran 2023</span>
-                    </div>
-                </div>
-            </footer>
-            <!-- End of Footer -->
-
+          <script>
+            $(document).ready(function () {
+              $("#single1").on("change", function () {
+                $("#my-form").submit();
+              });
+            });
+          </script>
+          <script>
+            $(document).ready(function () {
+              $("#end_input").on("change", function () {
+                $("#date_range_form").submit();
+              });
+            });
+          </script>
         </div>
-        <!-- End of Content Wrapper -->
+        <!-- /.container-fluid -->
+      </div>
+      <!-- End of Main Content -->
 
+      <!-- Footer -->
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span
+              >Powered by
+              <a href="https://keybyme.com"
+                >Keybyme <i class="fa fa-key" aria-hidden="true"></i></a
+            ></span>
+          </div>
+        </div>
+      </footer>
+      <!-- End of Footer -->
     </div>
-    <!-- End of Page Wrapper -->
+    <!-- End of Content Wrapper -->
+  </div>
+  <!-- End of Page Wrapper -->
 
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
 
-
-
- 
-
-    {% include 'footer.html' %}
+  {% include 'footer.html' %}
+</body>

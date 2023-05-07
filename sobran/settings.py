@@ -94,20 +94,33 @@ WSGI_APPLICATION = 'sobran.wsgi.application'
 # }
 
 
-
+#digital ocean
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sobrandb2',
-        'USER': 'root',
-        'PASSWORD':'2552',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'USER': 'doadmin',
+        'PASSWORD':'AVNS_0Yy4HWwmjgAwuL2SNrc',
+        'HOST': 'db-mysql-nyc1-70308-do-user-14066511-0.b.db.ondigitalocean.com',
+        'PORT': '25060',
         	'OPTIONS': { 
             'sql_mode': 'traditional',
         }
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'sobrandb2',
+#         'USER': 'root',
+#         'PASSWORD':'2552',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#         	'OPTIONS': { 
+#             'sql_mode': 'traditional',
+#         }
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
