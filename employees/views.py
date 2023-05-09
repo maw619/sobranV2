@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import SoEmployee, SoOut, SoType, Shift
 from .forms import SoOutForm, UpdateoOutsForm
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -104,6 +104,7 @@ def home(request):
         sout = SoOut.objects.filter(Q(co_fk_em_id_key__em_name__exact=employee_name) & Q(co_date__isnull=True))
         date_range_label = f"Transactions for {employee_name} for {start_date} | found {sout.count()} results"
     elif start_date is today and end_date is today and check == "on":
+        date_range_label = f"Showing all Transactions"
         sout = SoOut.objects.all()
     else:
         sout = SoOut.objects.filter(co_date__range=[start_date, end_date])
@@ -111,7 +112,9 @@ def home(request):
     
     #sout = SoOut.objects.filter(co_date=str(today))
     sout.order_by('-co_date')
-
+    
+    time_diff_total = timedelta()
+    print("time diff total: ", time_diff_total) 
     emp = SoEmployee.objects.all()
     emp.order_by('-em_name')
     shift = Shift.objects.all()
@@ -120,9 +123,28 @@ def home(request):
         r_start = x.red_start
         g_start = x.green_start
 
-    print("y_start", y_start)
-    print("red_start", r_start)
-    print("green_start", g_start)
+    # print("y_start", y_start)
+    # print("red_start", r_start)
+    # print("green_start", g_start)
+ 
+    time_diff_total = timedelta()
+    for item in sout:
+        if item.co_time_dif is not None and ":" in item.co_time_dif:
+            hours, minutes = map(int, item.co_time_dif.split(':'))
+            time_diff = timedelta(hours=hours, minutes=minutes)
+            time_diff_total += time_diff
+
+    # Calculate the total hours and minutes
+    total_minutes = time_diff_total.total_seconds() // 60
+    total_hours = total_minutes // 60
+    minutes_remaining = total_minutes % 60
+
+    # Format the total time difference as "hh:mm"
+    total_time_diff_formatted = f"{int(total_hours):02d}:{int(minutes_remaining):02d}" if time_diff_total else ""
+ 
+
+    # Convert the total time difference to a formatted string
+    total_time_diff_formatted = str(time_diff_total)
 
     form = SoOutForm(request.POST or None, initial={'co_time_arrived': datetime.now().time(), 'co_date': date.today()}) 
     if request.method == 'POST':
@@ -161,10 +183,12 @@ def home(request):
                 else:
                     time_diff = None
                 form.instance.co_time_dif = str(time_diff)[0:4] 
+                 
                 form.save() 
+                
                 return redirect('home') 
-           
-    context = {'sout': sout, 'emp': emp, 'form':form, 'date_today': datetime.today().date(),'date_range_label': date_range_label, 'date_value':str(end_date_datetime), 'type': type}
+         
+    context = {'sout': sout, 'emp': emp, 'form':form, 'date_today': datetime.today().date(),'date_range_label': date_range_label, 'date_value':str(end_date_datetime), 'type': type,'total_time_diff': total_time_diff_formatted}
     return render(request, 'home.html', context)
 
 

@@ -11,8 +11,8 @@ class SoOutForm(ModelForm):
         fields = ['co_date','co_time_dif','co_time_arrived','co_fk_type_id_key','co_fk_em_id_key']
         labels = { 'co_fk_type_id_key':'Type','co_fk_em_id_key': 'Employee'}
         widgets = {
-            'co_fk_em_id_key': forms.Select(attrs={'class':'form-control', 'id':'single1'}),
-            'co_fk_type_id_key': forms.Select(attrs={'class':'form-control', 'id':'single3'}), 
+            'co_fk_em_id_key': forms.Select(attrs={'class':'form-control', 'id':'single1', 'required':'True'}),
+            'co_fk_type_id_key': forms.Select(attrs={'class':'form-control', 'id':'single3', 'required':'True'}), 
             'co_time_arrived': forms.HiddenInput(),
             'co_date': forms.HiddenInput(),
             'co_time_dif': forms.HiddenInput()
@@ -32,7 +32,7 @@ class UpdateoOutsForm(ModelForm):
         }
         widgets = { 
             'co_fk_em_id_key': forms.HiddenInput(),
-            'co_fk_type_id_key': forms.Select(attrs={'class':'form-control','required': True}), 
+            'co_fk_type_id_key': forms.Select(attrs={'class':'form-control'}), 
             'co_time_arrived': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
             'co_date': DateInput(attrs={'class':'form-control','type': 'date'}),
             'co_time_dif': forms.HiddenInput()
