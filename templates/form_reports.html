@@ -10,15 +10,15 @@
     <div class="form-group">
         <label for="name" style="color: white">Employee</label>
         <select name="employee_name" id="employee_name" class="form-control">
+     
             <option value="" disabled selected>Select Employee</option>
             {% for x in emp %}
-            <option value="" disabled selected>Select Employee</option>
             <option value="{{x.em_name}}" >{{x.em_name}}</option>
             {% endfor %}
         </select>
     </div>
     <div class="form-group">
-        <label for="name" style="color: white">Name</label>
+        <label for="name" style="color: white">Type</label>
         <select name="employee_type" id="employee_type" class="form-control">
             <option value="" disabled selected>Select Type</option>
             {% for x in type %}

@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from .forms import DateRangeForm 
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseBadRequest
+
 
 
 def login_user(request):
@@ -51,8 +52,7 @@ def home(request):
         date_range_label = f"Transactions for {datetime.today().date().strftime('%B %d, %Y')}"
         start_date = today
         end_date = today
-    else:
-        
+    else: 
         start_date = request.GET.get('start_date')
         start_date_datetime = datetime.strptime(start_date, '%Y-%m-%d')
         start_date_formatted = start_date_datetime.strftime('%B %d, %Y')  
@@ -76,7 +76,7 @@ def home(request):
         print("check: ", check) 
         #sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]))
         sout = SoOut.objects.filter(Q(co_date__range=[start_date, end_date]) & Q(co_fk_em_id_key__em_name__exact=employee_name)) 
-        date_range_label = f"Transactions for {employee_name} for {today.strftime('%B %d, %Y')} | found {sout.count()} results"
+        date_range_label = f"Transactions for {employee_name} for {today} | found {sout.count()} results"
         print(f"results with employee name {employee_name} | found {sout.count()} results")
     elif employee_name is not None and check == "on":
         print("check: ", check)
@@ -104,32 +104,35 @@ def home(request):
         sout = SoOut.objects.filter(Q(co_fk_em_id_key__em_name__exact=employee_name) & Q(co_date__isnull=True))
         date_range_label = f"Transactions for {employee_name} for {start_date} | found {sout.count()} results"
     elif start_date is today and end_date is today and check == "on":
-        date_range_label = f"Showing all Transactions"
         sout = SoOut.objects.all()
-    else:
+        date_range_label = f"Showing all Transactions | found {sout.count()} results"
+    elif start_date != end_date is not None and employee_name is None and employee_type is None and check is None:
+        print("inside start date and end date")
         sout = SoOut.objects.filter(co_date__range=[start_date, end_date])
+        date_range_label = f"Transactions for {start_date} to {end_date} | found {sout.count()} results"
+    
+    #  this doesnt work
+    # elif start_date == end_date and employee_name is None and employee_type is None and check is None: 
+    #     sout = SoOut.objects.filter(co_date=start_date)
+    #     date_range_label = f"Transactions for {start_date} | found {sout.count()} results"
+    else:  
+        sout = SoOut.objects.filter(co_date=start_date)
         date_range_label = f"Transactions for {start_date} | found {sout.count()} results"
     
     #sout = SoOut.objects.filter(co_date=str(today))
     sout.order_by('-co_date')
     
-    time_diff_total = timedelta()
-    print("time diff total: ", time_diff_total) 
+    time_diff_total = timedelta() 
     emp = SoEmployee.objects.all()
     emp.order_by('-em_name')
-    shift = Shift.objects.all()
-    for x in shift:
-        y_start = x.yellow_start
-        r_start = x.red_start
-        g_start = x.green_start
+    shift = Shift.objects.all() 
+     
+             
 
-    # print("y_start", y_start)
-    # print("red_start", r_start)
-    # print("green_start", g_start)
- 
     time_diff_total = timedelta()
     for item in sout:
         if item.co_time_dif is not None and ":" in item.co_time_dif:
+            print("item.co_time_dif: ", item.co_time_dif)
             hours, minutes = map(int, item.co_time_dif.split(':'))
             time_diff = timedelta(hours=hours, minutes=minutes)
             time_diff_total += time_diff
@@ -146,49 +149,126 @@ def home(request):
     # Convert the total time difference to a formatted string
     total_time_diff_formatted = str(time_diff_total)
 
-    form = SoOutForm(request.POST or None, initial={'co_time_arrived': datetime.now().time(), 'co_date': date.today()}) 
+    form = SoOutForm(request.POST or None, initial={'co_time_arrived': datetime.now().time(), 'co_date': date.today()})
     if request.method == 'POST':
         employee_name = request.POST.get('co_employee')
         print("employee name: ", employee_name)
         if form.is_valid():
-            #form values
-            time_arrived = form.instance.co_time_arrived 
-            type = form.instance.co_fk_type_id_key.description 
+            # Form values
+            time_arrived = form.instance.co_time_arrived
+            type = form.instance.co_fk_type_id_key.description
             zone = form.instance.co_fk_em_id_key.em_zone
-           
-            print("zone: ", zone)
-            if zone == 2:
-                time = y_start
-            elif zone == 3:
-                time = g_start
-            else:
-                time = r_start
- 
+            print(f"zone for {form.instance.co_fk_em_id_key}: ", zone)
+            for x in shift:
+                y_start = x.yellow_start
+                r_start = x.red_start
+                g_start = x.green_start
 
-            #get employee name from form and assign it to the instance
-            employee_name = request.POST.get('co_employee') 
+                y_end = x.yellow_end
+                r_end = x.red_end
+                g_end = x.green_end
+
+             
+            # Get employee name from form and assign it to the instance
+            employee_name = request.POST.get('co_employee')
             form.instance.co_fk_em_id_key.em_name = employee_name
 
-            #check type of absence
-            if type == "Vacation" or type == "Call-out" or type == "Left early":
-                form.instance.co_time_arrived = None
-                form.instance.co_time_dif = None 
-                form.save()
-                messages.success(request, f"Marked as {type}")
-                return redirect('home') 
+            # Check type of absence
+            if type == "Vacation" or type == "Call-out":
+                if zone == 1: 
+                    yellow_shift_start = datetime.combine(datetime.today(), y_start)
+                    yellow_shift_end = datetime.combine(datetime.today(), y_end)
+                    time_shift = (yellow_shift_end - yellow_shift_start).total_seconds() // 60
+
+                    hours, minutes = divmod(time_shift, 60)
+                    formatted_time = '{:02d}:{:02d}'.format(int(hours), int(minutes))
+
+                    # Add 30 minutes to the time
+                    time_delta = timedelta(minutes=30)
+                    updated_time = datetime.strptime(formatted_time, '%H:%M') - time_delta
+                    formatted_updated_time = updated_time.strftime('%H:%M')
+
+                    form.instance.co_time_arrived = None
+                    form.instance.co_time_dif = formatted_updated_time
+
+                    form.save()
+                    return redirect('home')
+                    
+                elif zone == 2:
+                    print("here from zone 2")
+                    red_shift_start = datetime.combine(datetime.today(), r_start)
+                    red_shift_end = datetime.combine(datetime.today(), r_end)
+                    time_shift = (red_shift_end - red_shift_start).total_seconds() // 60
+
+                    hours, minutes = divmod(time_shift, 60)
+                    formatted_time = '{:02d}:{:02d}'.format(int(hours), int(minutes))
+
+                    # Add 30 minutes to the time
+                    time_delta = timedelta(minutes=30)
+                    updated_time = datetime.strptime(formatted_time, '%H:%M') - time_delta
+                    formatted_updated_time = updated_time.strftime('%H:%M')
+
+                    form.instance.co_time_arrived = None
+                    form.instance.co_time_dif = formatted_updated_time
+
+                    form.save()
+                    return redirect('home') 
+                
+                else:
+                    green_shift_end = datetime.combine(datetime.today(), g_end)
+                    green_shift_start = datetime.combine(datetime.today(), g_start)
+                    time_shift = (green_shift_end - green_shift_start).total_seconds() // 60
+
+                    hours, minutes = divmod(time_shift, 60)
+                    formatted_time = '{:02d}:{:02d}'.format(int(hours), int(minutes))
+
+                    # Add 30 minutes to the time
+                    time_delta = timedelta(minutes=30)
+                    updated_time = datetime.strptime(formatted_time, '%H:%M') - time_delta
+                    formatted_updated_time = updated_time.strftime('%H:%M')
+
+                    form.instance.co_time_arrived = None
+                    form.instance.co_time_dif = formatted_updated_time
+
+                    form.save()
+                    return redirect('home')
+                
+            elif type == "Left early" and time_arrived is not None:
+                if zone == 1:
+                    time = y_start
+                    yellow_shift_end = datetime.combine(datetime.today(), y_end)
+                    time_arrived_dt = datetime.combine(datetime.today(), time_arrived)
+                    print("inside zone 1")
+                    time_diff = yellow_shift_end - time_arrived_dt
+                elif zone == 2:
+                    time = r_start
+                    red_shift_end = datetime.combine(datetime.today(), r_end)
+                    time_arrived_dt = datetime.combine(datetime.today(), time_arrived)
+                    print("inside zone 2")
+                    time_diff = red_shift_end - time_arrived_dt
+                else:
+                    time = g_start
+                    green_shift_end = datetime.combine(datetime.today(), g_end)
+                    time_arrived_dt = datetime.combine(datetime.today(), time_arrived)
+                    print("inside zone 3")
+                    time_diff = green_shift_end - time_arrived_dt
             else:  
                 form.save()  
                 if form.instance.co_time_arrived is not None:
-                    time_diff = datetime.combine(datetime.today(), time_arrived ) - datetime.combine(datetime.today(), time) 
+                    if zone == 1:
+                        time_diff = datetime.combine(datetime.today(), time_arrived ) - datetime.combine(datetime.today(), y_start) 
+                    elif zone == 2:
+                        time_diff = datetime.combine(datetime.today(), time_arrived ) - datetime.combine(datetime.today(), r_start)
+                    else:
+                        time_diff = datetime.combine(datetime.today(), time_arrived ) - datetime.combine(datetime.today(), g_start)
                 else:
                     time_diff = None
-                form.instance.co_time_dif = str(time_diff)[0:4] 
-                 
-                form.save() 
-                
+                form.instance.co_time_dif = str(time_diff)[0:4]  
+                form.save()  
                 return redirect('home') 
+                 
          
-    context = {'sout': sout, 'emp': emp, 'form':form, 'date_today': datetime.today().date(),'date_range_label': date_range_label, 'date_value':str(end_date_datetime), 'type': type,'total_time_diff': total_time_diff_formatted}
+    context = {'sout': sout, 'emp': emp, 'form':form, 'date_today': datetime.today().date(),'date_range_label': date_range_label, 'date_value':str(end_date_datetime), 'type': type,'total_time_diff': total_time_diff_formatted[:4]}
     return render(request, 'home.html', context)
 
 
@@ -211,29 +291,36 @@ def date_range_view(request):
 
 
 
-
-
-
+ 
 def delete_so_out(request, pk): 
     sout = SoOut.objects.get(co_id_key=pk)
     sout.delete()
     messages.success(request, "deleted successfully")
     return redirect('home')
 
- 
+
+
+
 def update_so_out(request, pk):
     emp = SoEmployee.objects.all()
     shift = Shift.objects.all()
+
     for x in shift:
         y_start = x.yellow_start
         r_start = x.red_start
         g_start = x.green_start
 
+        y_end = x.yellow_end
+        r_end = x.red_end
+        g_end = x.green_end
+
     sout = SoOut.objects.get(co_id_key=pk)
     print(sout.co_date)
     employee_name = request.POST.get('co_employee')
     form = UpdateoOutsForm(request.POST or None, instance=sout)
+
     if request.method == 'POST':
+        
         print("employee name: ", employee_name)
         if form.is_valid():
             # form values
@@ -242,35 +329,98 @@ def update_so_out(request, pk):
             zone = form.instance.co_fk_em_id_key.em_zone
             print(f"zone for {form.instance.co_fk_em_id_key}: ", zone)
 
-            if zone == 2:
+            if zone == 1:
                 time = y_start
-            elif zone == 3:
-                time = g_start
-            else:
+            elif zone == 2:
                 time = r_start
+            else:
+                time = g_start
 
             # get employee name from form and assign it to the instance
             employee_name = request.POST.get('co_employee')
             form.instance.co_fk_em_id_key.em_name = employee_name
 
             # check type of absence
-            if type == "Vacation" or type == "Call-out" or type == "Left early":
-                form.instance.co_time_arrived = None
-                form.instance.co_time_dif = None
-                form.save()
-                messages.success(request, f"Marked as {type}")
-                return redirect('home')
+            if type == "Vacation" or type == "Call-out":
+                if zone == 1:
+                    red_shift_start = datetime.combine(datetime.today(), r_start)
+                    red_shift_end = datetime.combine(datetime.today(), r_end)
+                    time_shift = (red_shift_end - red_shift_start).total_seconds() // 60
+
+                    hours, minutes = divmod(time_shift, 60)
+                    formatted_time = '{:02d}:{:02d}'.format(int(hours), int(minutes))
+
+                    form.instance.co_time_arrived = None
+                    form.instance.co_time_dif = formatted_time 
+ 
+                    form.save()
+                    return redirect('home')
+                elif zone == 2:
+                    yellow_shift_start = datetime.combine(datetime.today(), y_start)
+                    yellow_shift_end = datetime.combine(datetime.today(), y_end)
+                    time_shift = (yellow_shift_end - yellow_shift_start).total_seconds() // 60
+
+                    hours, minutes = divmod(time_shift, 60)
+                    formatted_time = '{:02d}:{:02d}'.format(int(hours), int(minutes))
+
+                    form.instance.co_time_arrived = None
+                    form.instance.co_time_dif = formatted_time 
+
+                    form.save()
+                    return redirect('home')
+                else:
+                    green_shift_end = datetime.combine(datetime.today(), g_end)
+                    green_shift_start = datetime.combine(datetime.today(), g_start)
+                    time_shift = (green_shift_end - green_shift_start).total_seconds() // 60
+
+                    hours, minutes = divmod(time_shift, 60)
+                    formatted_time = '{:02d}:{:02d}'.format(int(hours), int(minutes))
+
+                    form.instance.co_time_arrived = None
+                    form.instance.co_time_dif = formatted_time 
+
+                    form.save()
+                    return redirect('home')
+                 
+                   
+            elif type == "Left early" and time_arrived is not None:
+  
+                if zone == 1:
+                    time = y_start
+                    yellow_shift_end = datetime.combine(datetime.today(), y_end)
+                    time_arrived_dt = datetime.combine(datetime.today(), time_arrived)
+                    print("inside zone 1")
+                    time_diff = yellow_shift_end - time_arrived_dt
+                elif zone == 2:
+                    time = r_start
+                    red_shift_end = datetime.combine(datetime.today(), r_end)
+                    time_arrived_dt = datetime.combine(datetime.today(), time_arrived)
+                    print("inside zone 2")
+                    time_diff = red_shift_end - time_arrived_dt
+                else:
+                    time = g_start
+                    green_shift_end = datetime.combine(datetime.today(), g_end)
+                    time_arrived_dt = datetime.combine(datetime.today(), time_arrived)
+                    print("inside zone 3")
+                    time_diff = green_shift_end - time_arrived_dt
+
+
+ 
+                form.instance.co_time_arrived = time_arrived
+                hours, remainder = divmod(time_diff.total_seconds(), 3600)
+                minutes, _ = divmod(remainder, 60)
+                form.instance.co_time_dif = "{:02d}:{:02d}".format(int(hours), int(minutes))  # Format as HH:MM
             else:
                 if time_arrived is not None:
                     print("time_arrived:  ", time_arrived)
                     form.instance.co_time_arrived = time_arrived
-                    time_diff = datetime.combine(datetime.today(), time_arrived) - datetime.combine(
-                        datetime.today(), time)
+                    time_diff = datetime.combine(datetime.today(), time_arrived) - datetime.combine(datetime.today(), time)
                 else:
                     time_diff = None
-                form.instance.co_time_dif = str(time_diff)[0:4]
-                form.save()
-                return redirect('home')
+                form.instance.co_time_dif = str(time_diff)[0:4] 
+            form.save()
+            return redirect('home')
+
     context = {'form2': form, 'name': form.instance.co_fk_em_id_key.em_name}
     return render(request, 'update_co.html', context)
 
@@ -293,40 +443,98 @@ def add_sout_manually(request):
     
     form = UpdateoOutsForm(request.POST or None)
     if request.method == 'POST':
+        employee_name = request.POST.get('co_employee')
+        print("employee name: ", employee_name)
+        if form.is_valid():
+            # Form values
+            time_arrived = form.instance.co_time_arrived
+            type = form.instance.co_fk_type_id_key.description
+            zone = form.instance.co_fk_em_id_key.em_zone
+            print(f"zone for {form.instance.co_fk_em_id_key}: ", zone)
+            for x in shift:
+                y_start = x.yellow_start
+                r_start = x.red_start
+                g_start = x.green_start
 
-        form.instance.co_time_arrived = request.POST.get('time')
-        print("time arrived: ", form.instance.co_time_arrived)
-        form.save()
-        zone = form.instance.co_fk_em_id_key.em_zone
-        print("zone: ", zone)
-        if zone == 2:
-            time = y_start
-        elif zone == 3:
-            time = g_start
-        else:
-            time = r_start  
+                y_end = x.yellow_end
+                r_end = x.red_end
+                g_end = x.green_end
 
 
-        time_value = request.POST.get('time')
-        if time_value == "":
-            time_obj = None
-        else:
-            time_obj = datetime.strptime(time_value, '%H:%M').time()
-        date_value = request.POST.get('date')
-        date_obj = datetime.strptime(date_value, '%Y-%m-%d').date()
-        print("date obj: ", date_obj)
-        form.instance.co_date = date_obj
-        form.instance.co_time_arrived = time_obj
-            
-        form.save()  
-        if time_obj is not None:
-            time_diff = datetime.combine(datetime.today(), time_obj) - datetime.combine(datetime.today(), time) 
-        else:
-            time_diff = None
-        form.instance.co_time_dif = str(time_diff)[0:4]
-        print("time diff: ", form.instance.co_time_dif)
-        form.save()  
-        return redirect('home')
+            # Get employee name from form and assign it to the instance
+            employee_name = request.POST.get('co_employee')
+            form.instance.co_fk_em_id_key.em_name = employee_name
+            form_time = request.POST.get('time')
+            # Check type of absence
+            if type == "Vacation" or type == "Call-out":
+                if zone == 1:
+                    red_shift_start = datetime.combine(datetime.today(), r_start)
+                    red_shift_end = datetime.combine(datetime.today(), r_end)
+                    time_shift = (red_shift_end - red_shift_start).total_seconds() // 60
+
+                    hours, minutes = divmod(time_shift, 60)
+                    formatted_time = '{:02d}:{:02d}'.format(int(hours), int(minutes))
+
+                    form.instance.co_time_arrived = None
+                    form.instance.co_time_dif = formatted_time 
+ 
+                    form.save()
+                    return redirect('home')
+                elif zone == 2:
+                    yellow_shift_start = datetime.combine(datetime.today(), y_start)
+                    yellow_shift_end = datetime.combine(datetime.today(), y_end)
+                    time_shift = (yellow_shift_end - yellow_shift_start).total_seconds() // 60
+
+                    hours, minutes = divmod(time_shift, 60)
+                    formatted_time = '{:02d}:{:02d}'.format(int(hours), int(minutes))
+
+                    form.instance.co_time_arrived = None
+                    form.instance.co_time_dif = formatted_time 
+
+                    form.save()
+                    return redirect('home')
+                else:
+                    green_shift_end = datetime.combine(datetime.today(), g_end)
+                    green_shift_start = datetime.combine(datetime.today(), g_start)
+                    time_shift = (green_shift_end - green_shift_start).total_seconds() // 60
+
+                    hours, minutes = divmod(time_shift, 60)
+                    formatted_time = '{:02d}:{:02d}'.format(int(hours), int(minutes))
+
+                    form.instance.co_time_arrived = None
+                    form.instance.co_time_dif = formatted_time 
+
+                    form.save()
+                    return redirect('home')
+
+            elif type == "Left early" and time_arrived is not None:
+                if zone == 1:
+                    time = y_start
+                    yellow_shift_end = datetime.combine(datetime.today(), y_end)
+                    time_arrived_dt = datetime.combine(datetime.today(), time_arrived)
+                    print("inside zone 1")
+                    time_diff = yellow_shift_end - time_arrived_dt
+                elif zone == 2:
+                    time = r_start
+                    red_shift_end = datetime.combine(datetime.today(), r_end)
+                    time_arrived_dt = datetime.combine(datetime.today(), time_arrived)
+                    print("inside zone 2")
+                    time_diff = red_shift_end - time_arrived_dt
+                else:
+                    time = g_start
+                    green_shift_end = datetime.combine(datetime.today(), g_end)
+                    time_arrived_dt = datetime.combine(datetime.today(), time_arrived)
+                    print("inside zone 3")
+                    time_diff = green_shift_end - time_arrived_dt
+            else:  
+                form.save()  
+                if form.instance.co_time_arrived is not None:
+                    time_diff = datetime.combine(datetime.today(), time_arrived ) - datetime.combine(datetime.today(),time_arrived) 
+                else:
+                    time_diff = None
+                form.instance.co_time_dif = str(time_diff)[0:4]  
+                form.save()  
+                return redirect('home') 
     context = {'form': form}
     return render(request, 'home.html', context)
 

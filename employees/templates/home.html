@@ -7,7 +7,7 @@
  
 <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary"> {{ date_range_label}}</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">{{date_range_label}}</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -17,8 +17,8 @@
                                                     <th>Name</th>
                                                     <th>Type</th>
                                                     <th>Date</th>
-                                                    <th>Time Arrived</th>
-                                                    <th>Time diff (total: {{ total_time_diff }})</th>
+                                                    <th>Time Arrived / Left</th>
+                                                    <th>Abs (total: {{ total_time_diff }})</th>
                                                     <th>edit</th>
                                                     <th>delete</th>
                                                 </tr>
@@ -29,7 +29,7 @@
                                                     <th>Type</th>
                                                     <th>Date</th>
                                                     <th>Time Arrived</th>
-                                                    <th>Time diff</th>
+                                                    <th>Abs (total: {{ total_time_diff }})</th>
                                                     <th>edit</th>
                                                     <th>delete</th>
                                                 </tr>
@@ -39,22 +39,26 @@
 
                                             {% for x in sout %}
                                             <tr>
-                                                {% comment %} <td><a href="{% url 'view_transaction' x.co_id_key %}">{{x.co_fk_em_id_key.em_name}}</a> </td> {% endcomment %}
                                                 <td><a href="{% url 'view_transaction' x.co_id_key %}" >{{x.co_fk_em_id_key.em_name}}</a> </td>
                                                 <td>{{x.co_fk_type_id_key}}</td>
-                                                <td>{{x.co_date}}</td> 
-                                            
+                                                <td>{{x.co_date}}</td>  
                                                 {% if x.co_time_arrived == None %}
                                                 <td></td>
-                                                <td></td>
-                                                {% else %}
-                                                <td>{{x.co_time_arrived}}</td>
                                                 <td>{{x.co_time_dif}}</td>
-                                                {% endif %}
-                                                                                            
+                                                {% else %}
+                                                <td>{{x.co_time_arrived}}</td> 
+                                                <td>{{x.co_time_dif}}</td>
+                                                {% endif %} 
+                                                                              
                                                 <td><a href="{% url 'update_so_out' x.co_id_key %}" ><i class="fa fa-pen-alt"></i></a></td>
-                                                <td><a href="{% url 'delete_so_out' x.co_id_key %}" style="color:red"><i class="fa fa-trash"></i></a></td>
-                  
+                                                
+                                                  <td>
+                                                     <form id="delete-form-{{ x.co_id_key }}" method="POST" action="{% url 'delete_so_out' x.co_id_key %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="co_id" value="{{ x.co_id_key }}">
+                                                        <a type="submit" class="delete-btn" style="color:red"><i class="fa fa-trash"></i></a>
+                                                    </form>
+                                                </td>
                                             </tr>
                                             {% endfor %}
                                             </tbody>
@@ -63,6 +67,32 @@
                                 </div>
                             </div>
 
+                                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                <script>
+                                $(document).ready(function() {
+                                $('.delete-btn').click(function(event) {
+                                    event.preventDefault(); // Prevent default form submission
+
+                                    var form = $(this).closest('form'); // Get the parent form
+                                    var formId = form.attr('id'); // Get the form ID
+
+                                    $.ajax({
+                                    type: 'POST',
+                                    url: form.attr('action'),
+                                    data: form.serialize(), // Serialize form data
+                                    success: function(response) {
+                                        // Handle successful response
+                                        // For example, you can remove the deleted row from the table
+                                        $('#' + formId).closest('tr').remove();
+                                    },
+                                    error: function(xhr, errmsg, err) {
+                                        // Handle error response
+                                        console.log(xhr.status + ": " + xhr.responseText);
+                                    }
+                                    });
+                                });
+                                });
+                                </script>
 
 
                                                         <!-- transaction Modal  data-toggle="modal" data-target="#addTransactionModal"-->

@@ -24,6 +24,22 @@ class SoOut(models.Model):
     co_time_arrived = models.TimeField(auto_now=False, auto_now_add=False, blank=True, null=True, verbose_name='Time Arrived', default=datetime.now().time().strftime('%I:%M'))
     co_time_dif = models.CharField(max_length=45, blank=True, null=True, verbose_name='Time Difference') 
   
+    # def save(self, *args, **kwargs):
+    #     if self.co_fk_type_id_key_id in [2, 3]:
+    #         shift = Shift.objects.first()  # Assuming you have only one Shift instance
+    #         red_start = shift.red_start
+    #         red_end = shift.red_end
+    #         time_diff = datetime.combine(datetime.today(), red_end) - datetime.combine(datetime.today(), red_start)
+    #         minutes = int(time_diff.total_seconds() // 60)
+    #         if self.co_fk_type_id_key_id == 2:
+    #             minutes *= 2
+    #         elif self.co_fk_type_id_key_id == 3:
+    #             minutes *= 3
+    #         hours = minutes // 60
+    #         minutes %= 60
+    #         self.co_time_dif = f"{hours:02d}:{minutes:02d}"
+    #     super().save(*args, **kwargs)
+    
     class Meta:
         managed = True
         db_table = 'so_outs'
@@ -44,11 +60,16 @@ class SoType(models.Model):
     def __str__(self) -> str:
         return self.description
     
+
 class Shift(models.Model):
     yellow_start = models.TimeField(blank=True, null=True, verbose_name='Yellow Zone Start', default=time(hour=6, minute=15))
     red_start = models.TimeField(blank=True, null=True, verbose_name='Red Zone Start', default=time(hour=5, minute=00))
     green_start = models.TimeField(blank=True, null=True, verbose_name='Green Zone Start', default=time(hour=4, minute=45))
     
+    yellow_end = models.TimeField(blank=True, null=True, verbose_name='Yellow Zone End', default=time(hour=14, minute=45))
+    red_end = models.TimeField(blank=True, null=True, verbose_name='Red Zone End', default=time(hour=13, minute=15))
+    green_end = models.TimeField(blank=True, null=True, verbose_name='Green Zone End', default=time(hour=12, minute=30))
+   
     class Meta:
         managed = True
         db_table = 'shiftstart'

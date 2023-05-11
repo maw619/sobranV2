@@ -6,6 +6,8 @@ from .models import SoEmployee, SoOut, SoType, Shift
  
 admin.site.register(Shift)
 
+admin.site.register(SoType)
+
 
 @admin.register(SoOut)
 class SoOutAdmin(admin.ModelAdmin): 
