@@ -621,15 +621,34 @@ def add_sout_manually(request):
                     form.instance.co_time_dif = time_diff_str
                     form.save()
                     return redirect('home')
-            else:  
-                form.save()  
+ 
+            else:
                 if form.instance.co_time_arrived is not None:
-                    time_diff = datetime.combine(datetime.today(), time_arrived ) - datetime.combine(datetime.today(),time_arrived) 
-                else:
-                    time_diff = None
-                form.instance.co_time_dif = str(time_diff)[0:4]  
-                form.save()  
-                return redirect('home') 
+                    time_arrived_str = request.POST.get('time')
+                    time_arrived = datetime.strptime(time_arrived_str, '%H:%M').time()  # Convert string to datetime.time
+                    if zone == 1:
+                        time_diff = datetime.combine(datetime.today(), time_arrived) - datetime.combine(datetime.today(), y_start)
+                        print("time_diff: zone 1", time_diff)
+                        form.instance.co_time_arrived = datetime.now().time()
+                        form.instance.co_time_dif = str(time_diff)[0:4]
+                        form.save()
+                        return redirect('home')
+                    elif zone == 2:
+                        time_diff = datetime.combine(datetime.today(), time_arrived) - datetime.combine(datetime.today(), r_start)
+                        print("time_diff: zone 2", time_diff)
+                        form.instance.co_time_arrived = datetime.now().time()
+                        form.instance.co_time_dif = str(time_diff)[0:4]
+                        form.save()
+                        return redirect('home')
+                    else:
+                        time_diff = datetime.combine(datetime.today(), time_arrived) - datetime.combine(datetime.today(), g_start)
+                        print("time_diff: zone", time_diff)
+                        form.instance.co_time_arrived = datetime.now().time()
+                        form.instance.co_time_dif = str(time_diff)[0:4]
+                        form.save()
+                        return redirect('home')
+
+                    
     context = {'form': form}
     return render(request, 'home.html', context)
 
